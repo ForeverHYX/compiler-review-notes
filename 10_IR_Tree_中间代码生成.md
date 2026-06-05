@@ -1,0 +1,257 @@
+# 10 IR Tree 与中间代码生成
+
+## 本章解决什么问题
+
+AST 还很接近源语言，不适合直接生成机器代码。中间表示把不同源语言统一到较低层结构，也让后端可以复用。
+
+## 为什么需要 IR
+
+如果每种源语言直接翻译到每种目标机器，需要 `N*M` 个翻译器。用 IR 后：
+
+```text
+N 个前端 -> IR -> M 个后端
+```
+
+复杂度接近 `N+M`。
+
+## Tree IR 节点
+
+表达式节点：
+
+| 节点 | 含义 |
+|---|---|
+| `CONST(i)` | 常量 |
+| `NAME(l)` | 标签地址 |
+| `TEMP(t)` | 临时变量 |
+| `BINOP(op,e1,e2)` | 二元运算 |
+| `MEM(e)` | 内存地址 `e` 处的值 |
+| `CALL(f,args)` | 函数调用 |
+| `ESEQ(s,e)` | 先执行语句 `s`，再求表达式 `e` |
+
+语句节点：
+
+| 节点 | 含义 |
+|---|---|
+| `MOVE(dst,src)` | 赋值 |
+| `EXP(e)` | 只为副作用求值 |
+| `JUMP(e,labels)` | 无条件跳转 |
+| `CJUMP(op,e1,e2,t,f)` | 条件跳转 |
+| `SEQ(s1,s2)` | 顺序执行 |
+| `LABEL(l)` | 标签 |
+
+## MEM 的双重语义
+
+`MEM(e)` 在右侧表示 load：
+
+```text
+TEMP t <- MEM(addr)
+```
+
+在 `MOVE(MEM(addr), value)` 左侧表示 store：
+
+```text
+MEM(addr) <- value
+```
+
+这是常见考点。
+
+## Ex、Nx、Cx
+
+源语言中很多东西都叫表达式，但翻译到 IR 时有三种形态：
+
+| 形态 | 含义 | 例子 |
+|---|---|---|
+| `Ex` | 产生一个值 | `a + b` |
+| `Nx` | 只产生副作用，不产生值 | `while`、赋值语句 |
+| `Cx` | 条件表达式，用跳转表示真假 | `a < b`、短路逻辑 |
+
+条件表达式不一定先算出 `0/1`，更常用跳转表达：
+
+```text
+if a < b goto trueLabel else falseLabel
+```
+
+### Ex/Nx/Cx 转换
+
+有时后续上下文需要另一种形态，可以转换：
+
+| 从 | 到 | 思路 |
+|---|---|---|
+| `Ex` -> `Nx` | `EXP(e)` | 只保留副作用，丢弃值 |
+| `Cx` -> `Nx` | 生成 true/false label | 条件只用于控制流 |
+| `Cx` -> `Ex` | 生成临时变量 `r` | true 分支令 `r=1`，false 分支令 `r=0` |
+| `Nx` -> `Ex` | 通常不自然 | 没有值，除非人为返回 0 |
+
+`Cx -> Ex` 的典型模板：
+
+```text
+r := 1
+Cx(cond, trueLabel, falseLabel)
+LABEL falseLabel
+r := 0
+LABEL trueLabel
+TEMP r
+```
+
+真实实现会更小心地放置 join label，但核心是“用控制流给临时变量赋真假值”。
+
+### Patch List / Backpatching
+
+为了先生成条件跳转、后补目标 label，编译器常让 `Cx` 保存两个待填列表：
+
+```text
+Cx = {
+  stm: CJUMP(op, left, right, ?, ?),
+  trues: 需要填 true label 的位置,
+  falses: 需要填 false label 的位置
+}
+```
+
+当外层 `if` 或 `while` 知道 true/false label 后，再把这些洞补上。这叫 backpatching。它让短路表达式和条件跳转的组合更自然。
+
+## 短路求值
+
+`a && b` 不能简单翻译成：
+
+```text
+t1 = eval(a)
+t2 = eval(b)
+t3 = t1 && t2
+```
+
+因为如果 `a` 为假，`b` 不应被求值。正确思路是控制流：
+
+```text
+if a goto check_b else false
+check_b:
+if b goto true else false
+```
+
+## 变量访问与 Static Link
+
+访问当前 frame 中变量：
+
+```text
+MEM(FP + offset)
+```
+
+访问外层变量：
+
+```text
+fp1 = MEM(FP + static_link_offset)
+fp2 = MEM(fp1 + static_link_offset)
+MEM(fp2 + var_offset)
+```
+
+沿 static link 走多少步由词法嵌套层级决定。
+
+## 控制结构翻译
+
+### if-then-else
+
+```text
+Cx(condition, trueLabel, falseLabel)
+LABEL trueLabel
+  then body
+JUMP join
+LABEL falseLabel
+  else body
+LABEL join
+```
+
+### while
+
+```text
+LABEL test
+  condition ? body : done
+LABEL body
+  body stm
+  JUMP test
+LABEL done
+```
+
+`break` 翻译为跳到当前循环的 `done` 标签。
+
+### for 循环翻译直觉
+
+`for i := lo to hi do body` 常降成类似 while：
+
+```text
+i := lo
+limit := hi
+LABEL test
+if i <= limit goto body else done
+LABEL body
+body
+if i < limit goto incr else done
+LABEL incr
+i := i + 1
+JUMP test
+LABEL done
+```
+
+要把 `hi` 保存到临时变量，避免每次迭代重复求值，也避免 `hi` 表达式有副作用时语义改变。
+
+## Fragment
+
+编译结果可能包含多类片段：
+
+- 字符串常量片段。
+- 函数过程片段。
+
+后端最终把这些片段汇总为目标汇编。
+
+## 例题：数组访问
+
+表达式：
+
+```text
+a[i]
+```
+
+如果 `a` 是数组基地址，元素大小为 4：
+
+```text
+MEM(a + i * 4)
+```
+
+若语言安全，还要加入 bounds check：
+
+```text
+if i < 0 goto error
+if i >= length(a) goto error
+MEM(base(a) + i * 4)
+```
+
+## 常见误区
+
+- IR 是树，不是一定等于三地址码。
+- `ESEQ` 很方便生成，但后面要规范化掉。
+- 条件表达式常用跳转而不是布尔值。
+- `CALL` 有副作用，会影响规范化和寄存器调用约定。
+- 数组/record 通常是指针，访问字段是地址计算再 `MEM`。
+
+## 练习
+
+1. 把 `x := a + b * c` 翻译成 Tree IR。
+2. 把 `if a < b then x := 1 else x := 2` 翻译为带 label 的 IR。
+3. 写出 `while i < n do i := i + 1` 的 IR 控制流。
+4. 解释 `Ex/Nx/Cx` 三者如何互相转换。
+
+## 术语中英对照
+
+| English | 中文 | 考试提示 |
+|---|---|---|
+| intermediate representation, IR | 中间表示 | 前后端桥梁 |
+| IR tree | IR 树 | 教材 Tree 表示 |
+| temporary | 临时变量 | `TEMP(t)` |
+| label | 标签 | 跳转目标 |
+| memory access | 内存访问 | `MEM(e)` |
+| load | 读内存 | `MEM` 在右侧 |
+| store | 写内存 | `MOVE(MEM(...),...)` |
+| side effect | 副作用 | 改变状态 |
+| conditional jump | 条件跳转 | `CJUMP` |
+| short-circuit evaluation | 短路求值 | 用控制流表示 |
+| fragment | 片段 | 字符串或过程输出 |
+| l-value | 左值 | 可被赋值的位置 |
+| r-value | 右值 | 表达式的值 |
