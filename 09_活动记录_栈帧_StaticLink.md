@@ -147,6 +147,10 @@ function f(a:int) =
 3. 给一个函数调用序列，标出 caller-save 和 callee-save 应保存的位置。
 4. 解释为什么访问外层变量不能只靠 dynamic link。
 
+## 练习参考答案
+
+见 [23_练习参考答案.md](23_练习参考答案.md) 中对应章节。
+
 ## 术语中英对照
 
 | English | 中文 | 考试提示 |
