@@ -20,6 +20,13 @@ Parse Tree 会包含 `E/T/F`、括号等文法节点；AST 只需：
     2   3
 ```
 
+## 本章考试能力清单
+
+- 概念题：能区分 parse tree、concrete syntax、abstract syntax、AST。
+- 构造题：能把表达式、赋值、数组访问、if/while/call 转成 Tiger 风格 AST 节点。
+- 实现题：能解释 tagged union、semantic value stack、semantic action、source position/source span。
+- 英文题：看到 `synthesized attribute`、`visitor`、`tree walking`、`Absyn` 能说出用途。
+
 ## Parse Tree vs AST
 
 | Parse Tree | AST |

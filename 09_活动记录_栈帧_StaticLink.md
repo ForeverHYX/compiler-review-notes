@@ -4,6 +4,13 @@
 
 函数调用不是简单跳转。调用时必须保存返回地址、参数、局部变量、临时值和部分寄存器。活动记录就是一次函数调用在运行时占用的一块栈空间，也叫栈帧。
 
+## 本章考试能力清单
+
+- 概念题：能解释 activation record、FP/SP、calling convention、caller-save/callee-save。
+- 手算题：能判断变量是否 escape，能画 static link/dynamic link，能计算访问外层变量要沿 static link 走几次。
+- 实现题：能说明 Level、Access、Formals、hidden static link parameter、view shift、prologue/epilogue。
+- 英文题：看到 `nonlocal variable`、`lexical level`、`return-value register` 能知道它们在栈帧中的作用。
+
 ## 运行时内存区域
 
 ```text

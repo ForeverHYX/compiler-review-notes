@@ -4,6 +4,13 @@
 
 SLR 用 FOLLOW 集限制归约，但 FOLLOW 是全局近似。有些时候，`A` 在某个具体上下文下只应该在少数 lookahead 上归约。LR(1) 把 lookahead 写进 item，提高精度。
 
+## 本章考试能力清单
+
+- 概念题：能比较 LR(0)、SLR、LR(1)、LALR 的 reduce 条件和精度。
+- 手算题：能计算 LR(1) closure 中的 `FIRST(beta a)`，能写 goto 后的 LR(1) items。
+- 冲突题：能解释 LALR 合并 same core 后为什么可能产生 reduce/reduce conflict。
+- 工具题：能读懂 Yacc/Bison 的 `%token`、`%union`、`%type`、`%left`、`$1`、`$$`。
+
 ## LR(1) Item
 
 LR(1) item 形如：

@@ -9,6 +9,13 @@ LR 的含义：
 - `L`：从左到右扫描输入。
 - `R`：构造最右推导的逆过程。
 
+## 本章考试能力清单
+
+- 概念题：能解释 shift、reduce、handle、viable prefix、LR item、closure、goto。
+- 手算题：能构造完整 LR(0) item sets、画 LR automaton、填 ACTION/GOTO 表、模拟 state stack。
+- 冲突题：能指出 shift/reduce 或 reduce/reduce conflict，并说明 SLR 如何用 FOLLOW 限制 reduce。
+- 英文题：看到 `augmented grammar`、`canonical collection`、`parser state` 能知道它对应哪一步。
+
 ## Shift-Reduce 思想
 
 分析器反复做两类动作：

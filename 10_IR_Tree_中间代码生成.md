@@ -4,6 +4,13 @@
 
 AST 还很接近源语言，不适合直接生成机器代码。中间表示把不同源语言统一到较低层结构，也让后端可以复用。
 
+## 本章考试能力清单
+
+- 概念题：能解释 Tree IR 节点、MEM 的 load/store 双重语义、l-value/r-value。
+- 手算题：能把 assignment、if、while、for、array access 翻译成带 LABEL/CJUMP/JUMP/MOVE 的 IR。
+- 形态题：能区分 Ex/Nx/Cx，并写出 Cx 到 Ex/Nx 的转换模板。
+- 英文题：看到 `fragment`、`external call`、`hidden static-link argument`、`field offset` 能知道怎么翻译。
+
 ## 为什么需要 IR
 
 如果每种源语言直接翻译到每种目标机器，需要 `N*M` 个翻译器。用 IR 后：

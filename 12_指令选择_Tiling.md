@@ -4,6 +4,13 @@
 
 指令选择把 IR Tree 映射为目标机器指令。核心问题是：一个 IR 树节点可能对应多种指令组合，怎样选择成本较低的组合？
 
+## 本章考试能力清单
+
+- 概念题：能解释 tree pattern、tile、tiling、abstract assembly、dst/src/jumps。
+- 手算题：能用 Maximal Munch 覆盖 IR tree，能用动态规划成本表求 optimal tiling。
+- 建模题：能为 OPER/LABEL/MOVE 写 dst/src/jumps，能说明 CALL 的 clobber 如何影响 liveness。
+- 英文题：看到 `regular tree grammar`、`munchExp/munchStm`、`BURG/Twig` 能说出它们和指令选择的关系。
+
 ## Tree Pattern 与 Tile
 
 目标机器指令可以看作覆盖 IR Tree 的小树模式。

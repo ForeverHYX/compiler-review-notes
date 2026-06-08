@@ -12,6 +12,13 @@ id = id + id * num
 
 Parser 要知道这是赋值语句，右边乘法优先于加法。
 
+## 本章考试能力清单
+
+- 概念题：能定义 CFG 四元组、terminal/nonterminal/production/start symbol、sentence、sentential form、yield。
+- 手算题：能写 leftmost/rightmost derivation，能画 parse tree，能用两棵 parse tree 证明 ambiguity。
+- 构造题：能从语言描述写 CFG，尤其是括号匹配、列表、表达式优先级和结合性。
+- 英文题：看到 `ambiguous grammar`、`context-free language`、`dangling else` 能给出例子。
+
 ## 上下文无关文法
 
 CFG 是四元组：

@@ -29,6 +29,13 @@ IF LPAREN ID(i) EQ ID(j) RPAREN ID(print) LPAREN STRING("equal") RPAREN SEMI
 
 如果走到某个接受状态，就说明刚读过的一段字符可以形成一个 token。真正的 lexer 还要记住“目前见过的最长合法 token”，因为输入 `if8` 时应该得到一个 `ID(if8)`，而不是 `IF` 后面跟 `NUM(8)`。
 
+## 本章考试能力清单
+
+- 概念题：能解释 token、lexeme、pattern、RE、NFA、DFA、epsilon-closure、longest match。
+- 手算题：能把 RE 画成 NFA，能用子集构造列 DFA 状态表，能按划分法最小化 DFA。
+- 工具题：能判断 Lex/Flex 中最长匹配和规则优先级的结果。
+- 英文题：看到 `Thompson construction`、`subset construction`、`transition function`、`accepting state` 能知道要写什么。
+
 ## Token、Lexeme、Pattern
 
 | 概念 | 解释 | 例子 |
