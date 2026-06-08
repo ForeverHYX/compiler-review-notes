@@ -145,6 +145,27 @@ MEM(fp2 + var_offset)
 
 沿 static link 走多少步由词法嵌套层级决定。
 
+## Tiger AST 到 Tree IR 翻译规则总表
+
+| AST | IR 翻译直觉 |
+|---|---|
+| `IntExp(i)` | `CONST(i)` |
+| `StringExp(s)` | 生成 string fragment，表达式为 `NAME(label)` |
+| `VarExp(v)` | 翻译变量地址/访问，得到 `Ex` |
+| `OpExp(a,+,b)` | `BINOP(PLUS, unEx(a), unEx(b))` |
+| 比较表达式 | `Cx(CJUMP(op, unEx(a), unEx(b), t, f))` |
+| `AssignExp(var,e)` | `Nx(MOVE(varAccess, unEx(e)))` |
+| `SeqExp(e1;...;en)` | 前面表达式转 `Nx`，最后一个保留值 |
+| `IfExp(test,then,else)` | 用 `Cx` 分支和 join label；有值时用临时变量收集结果 |
+| `WhileExp(test,body)` | `test/body/done` 三个 label；`break` 跳 `done` |
+| `ForExp(i,lo,hi,body)` | 降成带 limit 临时变量的 while |
+| `CallExp(f,args)` | `CALL(NAME f_label, staticLink :: args)` |
+| `RecordExp` | 调 runtime 分配对象，再按字段 offset 写入 |
+| `ArrayExp` | 调 runtime 初始化数组 |
+| `LetExp(decs,body)` | 声明产生初始化语句，再接 body |
+
+`unEx/unNx/unCx` 是把 `Tr_exp` 强制转换为需要形态的接口。考试看到这些名字，要知道它们不是源语言函数，而是翻译模块内部工具。
+
 ## 控制结构翻译
 
 ### if-then-else
@@ -201,6 +222,25 @@ LABEL done
 
 后端最终把这些片段汇总为目标汇编。
 
+字符串片段示例：
+
+```text
+StringFrag(label=L_str0, value="hello")
+```
+
+过程片段示例：
+
+```text
+ProcFrag(body=Tree IR statements, frame=f_frame)
+```
+
+函数调用外部 runtime 时常生成 `external call`，例如：
+
+```text
+CALL(NAME "initArray", [size, init])
+CALL(NAME "allocRecord", [bytes])
+```
+
 ## 例题：数组访问
 
 表达式：
@@ -209,10 +249,24 @@ LABEL done
 a[i]
 ```
 
-如果 `a` 是数组基地址，元素大小为 4：
+如果 `a` 已经是数组基地址，元素大小为 4：
 
 ```text
 MEM(a + i * 4)
+```
+
+但在 Tiger 翻译里，局部变量 `a` 通常不是“基地址本身的名字”，而是一个变量访问位置。若 `a` 是存在 frame 里的数组变量，先要读出数组指针：
+
+```text
+a_ptr = MEM(FP + a_offset)
+addr  = BINOP(PLUS, a_ptr, BINOP(MUL, i, CONST wordSize))
+MEM(addr)
+```
+
+如果数组对象头部还保存长度，元素起始地址可能要跳过 header：
+
+```text
+MEM(a_ptr + headerSize + i * wordSize)
 ```
 
 若语言安全，还要加入 bounds check：
@@ -257,5 +311,13 @@ MEM(base(a) + i * 4)
 | conditional jump | 条件跳转 | `CJUMP` |
 | short-circuit evaluation | 短路求值 | 用控制流表示 |
 | fragment | 片段 | 字符串或过程输出 |
+| proc fragment | 过程片段 | 函数体和 frame |
+| string fragment | 字符串片段 | 字符串常量数据 |
+| external call | 外部调用 | 调 runtime 函数 |
+| hidden static-link argument | 隐藏 static link 参数 | 函数调用额外实参 |
+| field offset | 字段偏移 | record 字段位置 |
+| base address | 基地址 | array/record 起始地址 |
+| word size | 字长 | offset 计算单位 |
+| unEx / unNx / unCx | 形态转换 | translate 模块接口 |
 | l-value | 左值 | 可被赋值的位置 |
 | r-value | 右值 | 表达式的值 |

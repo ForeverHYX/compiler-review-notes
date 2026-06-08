@@ -70,6 +70,38 @@ struct A_exp_ {
 
 核心思想：用 `kind` 区分节点类型，用 `union` 存不同字段。
 
+### Tiger 风格 AST 节点清单
+
+教材 Tiger 编译器常把 AST 分成几大类：
+
+| 类别 | 作用 | 典型节点 |
+|---|---|---|
+| `Var` | 左值/变量位置 | `SimpleVar`、`FieldVar`、`SubscriptVar` |
+| `Exp` | 表达式 | `IntExp`、`StringExp`、`VarExp`、`OpExp`、`CallExp`、`IfExp`、`WhileExp` |
+| `Dec` | 声明 | `VarDec`、`TypeDec`、`FunctionDec` |
+| `Ty` | 类型语法 | `NameTy`、`RecordTy`、`ArrayTy` |
+
+常见节点字段：
+
+```text
+SimpleVar(name)
+FieldVar(var, fieldName)
+SubscriptVar(var, indexExp)
+
+OpExp(left, oper, right)
+CallExp(funcName, args)
+RecordExp(typeName, fields)
+ArrayExp(typeName, size, init)
+AssignExp(var, exp)
+IfExp(test, then, else?)
+WhileExp(test, body)
+ForExp(var, lo, hi, body)
+LetExp(decs, body)
+SeqExp(expList)
+```
+
+这里 `var` 与 `exp` 要分清：`a[i]` 作为左值是 `SubscriptVar(SimpleVar(a), VarExp(SimpleVar(i)))`；如果它出现在表达式位置，还要包成 `VarExp(...)`。
+
 ### 面向对象类层次
 
 ```text
@@ -95,6 +127,35 @@ line 12: undefined variable x
 
 没有位置信息，错误信息会很难用。
 
+更精确的编译器会保存 `source span`：
+
+```text
+start line/column + end line/column
+```
+
+例如 `a[i] = b + 1` 的赋值节点可以保存整个语句范围，而 `b + 1` 的 `OpExp` 保存右侧表达式范围。这样语义分析报错时可以高亮具体子表达式，而不是只报整行。
+
+## 语义值栈如何构造 AST
+
+在 LR/Yacc parser 中，状态栈旁边通常还有语义值栈。每次 shift 一个 token，就把 token 的语义值压栈；每次 reduce，就弹出右部语义值，执行动作，生成左部语义值。
+
+规则：
+
+```yacc
+exp : exp '+' exp { $$ = A_OpExp($1, PLUS, $3); }
+```
+
+归约 `exp '+' exp` 时：
+
+```text
+$1 = 左边 exp 的 AST
+$2 = '+' token
+$3 = 右边 exp 的 AST
+$$ = 新的 OpExp AST
+```
+
+如果还维护位置栈，`$$.pos` 通常取 `$1` 起点到 `$3` 终点。
+
 ## AST 遍历
 
 后续阶段大多是递归遍历 AST：
@@ -102,6 +163,26 @@ line 12: undefined variable x
 - 语义分析：遍历 AST，同时维护符号表。
 - IR 生成：把每个 AST 节点翻译成 IR 片段。
 - pretty print：把 AST 打印回接近源码的形式。
+
+递归遍历模板：
+
+```text
+visitExp(e):
+  case IntExp:
+    handle integer
+  case VarExp:
+    visitVar(e.var)
+  case OpExp:
+    visitExp(e.left)
+    visitExp(e.right)
+  case LetExp:
+    enter scope
+    visitDecs(e.decs)
+    visitExp(e.body)
+    exit scope
+```
+
+后续章节的 `transExp`、`transVar`、`transDec` 基本就是带返回值和环境参数的 AST 遍历。
 
 ## 例题：从 Parse Tree 到 AST
 
@@ -159,9 +240,16 @@ AST：
 | concrete syntax | 具体语法 | 源码表面形式 |
 | semantic action | 语义动作 | parser 归约时执行 |
 | semantic stack | 语义值栈 | 与状态栈并行 |
+| attribute grammar | 属性文法 | 给语法符号附加属性 |
+| synthesized attribute | 综合属性 | 从子节点向父节点传 |
+| inherited attribute | 继承属性 | 从父/兄弟传给子节点 |
 | tagged union | 带标签联合 | C 中常用 AST 表示 |
 | variant | 变体 | AST 节点不同种类 |
 | source position | 源码位置 | 报错定位 |
+| source span | 源码范围 | 起止位置 |
 | tree traversal | 树遍历 | 递归访问 AST |
+| tree walking | 树遍历 | traversal 同义 |
+| visitor | 访问者 | 常见遍历模式 |
+| pretty printer | 美化打印器 | AST -> 可读源码 |
+| Absyn | 抽象语法模块 | Appel/Tiger 常见命名 |
 | constructor | 构造函数 | 创建 AST 节点 |
-

@@ -75,6 +75,28 @@
 - 生命周期超过当前作用域。
 - 需要通过引用传递。
 
+### Escape 分析算法
+
+对 AST 做一次遍历，给每个变量声明记录声明所在词法深度 `declDepth`：
+
+```text
+traverseExp(exp, depth):
+  遇到变量声明 var x:
+    记录 x.declDepth = depth
+    先假设 x.escape = false
+    遍历初始化表达式
+
+  遇到函数声明 function f(...):
+    参数 declDepth = depth + 1
+    遍历函数体时 depth + 1
+
+  遇到变量使用 x:
+    如果 currentDepth > x.declDepth:
+      x.escape = true
+```
+
+直觉：如果变量在更深的内层函数中被使用，当前函数返回前后都可能需要通过 static link 访问它，因此不能只放在当前函数的寄存器里。
+
 ## Static Link 与 Dynamic Link
 
 ### Dynamic Link
@@ -111,6 +133,90 @@ inner frame --static link--> outer frame
 | `InReg(t)` | 变量在临时寄存器 `t` 中 |
 | `F_newFrame` | 创建新函数 frame |
 | `F_allocLocal` | 分配局部变量位置 |
+
+### Level、Access、Formals
+
+Tiger 编译器常再加一层 `Level`，表示词法层级：
+
+| 抽象 | 含义 |
+|---|---|
+| `Level` | 一个函数的词法层级，内部包含 frame 和 parent level |
+| `Access` | 变量访问方式，包含变量所在 level 和 frame access |
+| `Formals` | 函数形参访问列表 |
+
+每个非顶层函数通常有一个隐藏形参：static link。它不是源程序里写出的参数，但会放进 frame 的 formals 中。比如：
+
+```text
+function outer(a:int) =
+  function inner(b:int) = a + b
+```
+
+`inner` 的真实调用参数可理解为：
+
+```text
+inner(static_link_to_outer, b)
+```
+
+### 调用时如何传 static link
+
+调用函数 `f` 时，编译器知道：
+
+- 当前函数所在 level：`currentLevel`
+- 被调用函数声明所在 level：`calleeLevel`
+- `calleeLevel.parent` 是它词法外层函数的 level
+
+要传给 `f` 的 static link 必须指向 `calleeLevel.parent` 对应的运行时 frame。
+
+算法：
+
+```text
+target = calleeLevel.parent
+sl = current frame pointer
+while currentLevel != target:
+  sl = MEM(sl + static_link_offset)
+  currentLevel = currentLevel.parent
+把 sl 作为隐藏第一个参数传给 callee
+```
+
+如果调用的是当前函数直接内层定义的函数，`target == currentLevel`，static link 就是当前 FP。
+
+### 非局部变量地址计算
+
+访问变量 `x`：
+
+```text
+x.level = 声明 x 的函数 level
+currentLevel = 当前函数 level
+fp = current FP
+while currentLevel != x.level:
+  fp = MEM(fp + static_link_offset)
+  currentLevel = currentLevel.parent
+address = fp + x.offset
+```
+
+如果 `x` 在当前 frame，循环 0 次；如果在外两层，沿 static link 走两次。
+
+## View Shift、Prologue/Epilogue
+
+`view shift` 指函数入口处把调用约定中的参数位置搬到函数体统一使用的位置。例如参数刚进入时在寄存器 `r1/r2`，但逃逸参数需要存入 frame：
+
+```text
+MOVE(MEM(FP + a_offset), TEMP arg_reg_1)
+```
+
+`prologue` 是函数入口代码，常做：
+
+- 保存返回地址和 callee-save 寄存器。
+- 建立新栈帧，调整 SP/FP。
+- 执行 view shift。
+
+`epilogue` 是函数出口代码，常做：
+
+- 把返回值放入 return-value register。
+- 恢复 callee-save 寄存器。
+- 销毁栈帧并跳回返回地址。
+
+教材中 `procEntryExit1/2/3` 常分阶段插入这些内容：先在 IR 层处理 view shift，再在汇编层补 sink/live-out 信息，最后生成真实入口出口汇编。
 
 ## 例题：判断变量位置
 
@@ -164,9 +270,18 @@ function f(a:int) =
 | caller-save register | 调用者保存寄存器 | caller 负责保存 |
 | callee-save register | 被调用者保存寄存器 | callee 负责保存 |
 | escape analysis | 逃逸分析 | 判断变量是否必须放内存 |
+| lexical level | 词法层级 | 函数嵌套深度 |
+| nonlocal variable | 非局部变量 | 外层函数中声明的变量 |
 | static link | 静态链 | 指向词法外层 frame |
 | dynamic link | 动态链 | 指向调用者 frame |
+| hidden static link parameter | 隐藏静态链参数 | 编译器自动加的形参 |
+| formal parameter | 形式参数 | 函数声明中的参数 |
+| actual parameter | 实际参数 | 调用时传入的参数 |
+| view shift | 视图转换 | 参数从调用约定位置搬到访问位置 |
+| prologue | 入口代码 | 建立栈帧 |
+| epilogue | 出口代码 | 恢复并返回 |
+| return-value register | 返回值寄存器 | 保存函数返回值 |
+| word size | 字长 | 一个机器字节数 |
 | display | display 表 | 快速访问外层 frame |
 | frame-resident variable | frame 中变量 | 存在栈帧 |
 | temporary | 临时变量 | IR/汇编中的虚拟寄存器 |
-

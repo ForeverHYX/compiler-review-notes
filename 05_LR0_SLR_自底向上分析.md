@@ -217,6 +217,118 @@ SLR 仍使用 LR(0) 项集 DFA，只在填表时使用 FOLLOW 集限制归约。
 
 LR(0) 冲突不一定说明语言有问题，可能只是 LR(0) 信息不够。SLR、LR(1)、LALR 会逐步增加精度。
 
+## 例题：完整 LR(0) 项集族与表
+
+文法：
+
+```text
+0. S' -> S EOF
+1. S  -> E
+2. E  -> E + T
+3. E  -> T
+4. T  -> id
+```
+
+### 项集族
+
+`I0 = closure(S' -> . S EOF)`：
+
+```text
+S' -> . S EOF
+S  -> . E
+E  -> . E + T
+E  -> . T
+T  -> . id
+```
+
+从 `I0` 出发：
+
+```text
+goto(I0, S) = I1:
+S' -> S . EOF
+
+goto(I0, E) = I2:
+S  -> E .
+E  -> E . + T
+
+goto(I0, T) = I3:
+E  -> T .
+
+goto(I0, id) = I4:
+T  -> id .
+```
+
+继续：
+
+```text
+goto(I1, EOF) = I5:
+S' -> S EOF .
+
+goto(I2, +) = I6:
+E -> E + . T
+T -> . id
+
+goto(I6, T) = I7:
+E -> E + T .
+
+goto(I6, id) = I4
+```
+
+没有新状态后停止。DFA 边：
+
+```text
+I0 --S--> I1
+I0 --E--> I2
+I0 --T--> I3
+I0 --id--> I4
+I1 --EOF--> I5
+I2 --+--> I6
+I6 --T--> I7
+I6 --id--> I4
+```
+
+### SLR ACTION/GOTO 表
+
+FOLLOW 集：
+
+```text
+FOLLOW(S) = { EOF }
+FOLLOW(E) = { +, EOF }
+FOLLOW(T) = { +, EOF }
+```
+
+用 SLR 规则填表：
+
+| 状态 | `id` | `+` | `EOF` | GOTO `S` | GOTO `E` | GOTO `T` |
+|---|---|---|---|---|---|---|
+| I0 | s4 |  |  | I1 | I2 | I3 |
+| I1 |  |  | s5 |  |  |  |
+| I2 |  | s6 | r1 `S->E` |  |  |  |
+| I3 |  | r3 `E->T` | r3 `E->T` |  |  |  |
+| I4 |  | r4 `T->id` | r4 `T->id` |  |  |  |
+| I5 |  |  | accept |  |  |  |
+| I6 | s4 |  |  |  |  | I7 |
+| I7 |  | r2 `E->E+T` | r2 `E->E+T` |  |  |  |
+
+`I2` 同时有完整项 `S -> E .` 和 shift 边 `+`。如果用 LR(0)，`S -> E` 会在所有终结符上归约，于是 `+` 格子出现 shift/reduce conflict；SLR 用 `FOLLOW(S)={EOF}` 限制 `S->E` 只在 EOF 上归约，因此消除这个冲突。
+
+### 状态栈分析 `id + id EOF`
+
+| 步骤 | 状态栈 | 符号栈 | 输入 | 动作 |
+|---|---|---|---|---|
+| 0 | `0` | empty | `id + id EOF` | s4 |
+| 1 | `0 4` | `id` | `+ id EOF` | r4 `T->id` |
+| 2 | `0 3` | `T` | `+ id EOF` | r3 `E->T` |
+| 3 | `0 2` | `E` | `+ id EOF` | s6 |
+| 4 | `0 2 6` | `E +` | `id EOF` | s4 |
+| 5 | `0 2 6 4` | `E + id` | `EOF` | r4 `T->id` |
+| 6 | `0 2 6 7` | `E + T` | `EOF` | r2 `E->E+T` |
+| 7 | `0 2` | `E` | `EOF` | r1 `S->E` |
+| 8 | `0 1` | `S` | `EOF` | s5 |
+| 9 | `0 1 5` | `S EOF` | empty | accept |
+
+这里状态号用 `I0=0` 等简写。实际考试只要表和栈动作一致，状态编号可以不同。
+
 ## 常见误区
 
 - LR(0) item 里的 `0` 表示 item 没有 lookahead，不是分析器不看输入。
@@ -262,3 +374,11 @@ T -> id
 | shift/reduce conflict | 移进/归约冲突 | 同格两种动作 |
 | reduce/reduce conflict | 归约/归约冲突 | 同格多个归约 |
 | SLR parsing | SLR 分析 | FOLLOW 限制 LR(0) 归约 |
+| augmented grammar | 增广文法 | 加 `S' -> S EOF` |
+| handle | 句柄 | 下一步应归约的右部实例 |
+| viable prefix | 可行前缀 | 可能出现在 LR 栈上的前缀 |
+| LR automaton | LR 自动机 | 项集 DFA |
+| parser state | 分析器状态 | 项集编号 |
+| state stack | 状态栈 | LR parser 核心栈 |
+| symbol stack | 符号栈 | 记录已识别符号 |
+| accepting state | 接受状态 | 可执行 accept |

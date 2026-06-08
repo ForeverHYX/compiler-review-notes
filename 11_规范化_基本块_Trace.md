@@ -40,6 +40,44 @@ commute(s, e) = true if s has no side effect or e is CONST/NAME
 
 实际实现可以更精细，但保守正确比激进错误更重要。
 
+## Canonicalization 重写规则
+
+规范化核心是把“藏在表达式里的语句”提出来，同时保持求值顺序。
+
+常见规则：
+
+| 原形式 | 目标 |
+|---|---|
+| `SEQ(SEQ(a,b),c)` | 展平成 `a; b; c` |
+| `ESEQ(s,e)` 出现在表达式里 | 先执行 `s`，再使用 `e` |
+| `CALL` 作为子表达式 | 先 `MOVE(TEMP t, CALL(...))`，再使用 `TEMP t` |
+| `MOVE(TEMP t, ESEQ(s,e))` | `s; MOVE(TEMP t,e)` |
+| `EXP(ESEQ(s,e))` | `s; EXP(e)` |
+
+如果不能证明 `s` 与后面的表达式可交换，就引入临时变量保护顺序：
+
+```text
+BINOP(PLUS, ESEQ(s, e1), e2)
+```
+
+可改成：
+
+```text
+s
+t := e1
+BINOP(PLUS, TEMP t, e2)
+```
+
+这样不会把 `e2` 提前到 `s` 前面。
+
+教材实现常见函数：
+
+```text
+do_stm(s): 规范化语句
+do_exp(e): 返回 (语句列表, 纯表达式)
+reorder(exps): 规范化一组表达式并保持求值顺序
+```
+
 ## Linearize
 
 `linearize` 把嵌套的 `SEQ` 展平为语句列表：
@@ -67,6 +105,32 @@ s3
 
 如果某段没有以 `LABEL` 开头，就补一个；如果没有以 jump 结尾，就补 `JUMP` 到下一块。
 
+### 从线性语句到 Basic Blocks
+
+算法：
+
+```text
+blocks = []
+current = []
+for each statement s in linear list:
+  if s is LABEL:
+    if current 非空且未以 JUMP/CJUMP 结束:
+      current.append(JUMP(s.label))
+      blocks.add(current)
+    current = [s]
+  else:
+    if current 为空:
+      current = [LABEL(newLabel)]
+    current.append(s)
+    if s is JUMP or CJUMP:
+      blocks.add(current)
+      current = []
+如果 current 非空:
+  current.append(JUMP(done))
+```
+
+这保证每个块都以 label 开头、以 jump 结尾。
+
 ## Trace Scheduling
 
 Trace 是把可能连续执行的 basic blocks 串起来。目标是减少无用跳转，并让 `CJUMP` 的 false label 紧跟在后面。
@@ -76,6 +140,58 @@ Trace 是把可能连续执行的 basic blocks 串起来。目标是减少无用
 1. 如果下一个块就是 `f`，很好。
 2. 如果下一个块是 `t`，可以反转条件，交换 `t/f`。
 3. 如果都不是，插入一个新的 false label 和 jump。
+
+### Trace 生成算法
+
+```text
+把所有 block 标记为 unmarked
+while 还有 unmarked block:
+  从某个 unmarked block 开始新 trace
+  while 当前 block 未标记:
+    标记当前 block
+    加入 trace
+    如果当前 block 以 JUMP 结尾且目标未标记:
+      current = 目标 block
+    else if 当前 block 以 CJUMP 结尾:
+      优先选择一个未标记后继继续
+    else:
+      stop
+```
+
+最终所有 trace 覆盖每个 block 一次，这叫 `trace covering`。重排后再处理每个 trace 末尾的 `CJUMP`，尽量让 false 分支成为 fall-through。
+
+## 例题：Basic Block 切分
+
+线性语句：
+
+```text
+LABEL L1
+MOVE(a,1)
+CJUMP(<,a,b,L2,L3)
+LABEL L2
+MOVE(x,2)
+LABEL L3
+MOVE(x,3)
+```
+
+切分：
+
+```text
+Block 1:
+  LABEL L1
+  MOVE(a,1)
+  CJUMP(<,a,b,L2,L3)
+
+Block 2:
+  LABEL L2
+  MOVE(x,2)
+  JUMP L3        // 因为遇到下一个 LABEL 前没有跳转，补 jump
+
+Block 3:
+  LABEL L3
+  MOVE(x,3)
+  JUMP done      // 结尾补 jump
+```
 
 ## 例题：CJUMP 调整
 
@@ -122,13 +238,20 @@ LABEL Ltrue
 |---|---|---|
 | canonical form | 规范形式 | 适合后端处理的 IR |
 | canonicalization | 规范化 | 消除 ESEQ/嵌套 CALL 等 |
+| reorder | 重排表达式 | 保持求值顺序 |
+| do_stm | 规范化语句函数 | Appel 实现名 |
+| do_exp | 规范化表达式函数 | 返回语句和纯表达式 |
 | linearize | 线性化 | Tree -> 语句列表 |
+| linear statement list | 线性语句表 | 无嵌套 SEQ 的语句序列 |
 | basic block | 基本块 | 单入口单出口语句序列 |
 | trace | 执行迹 | 可能连续执行的块序列 |
+| trace covering | trace 覆盖 | 每个块属于一个 trace |
+| marked block | 已标记块 | trace 生成中已选 |
+| redundant jump | 冗余跳转 | 跳到下一条 label 的 jump |
+| condition negation | 条件取反 | 交换 true/false label |
 | trace scheduling | Trace 调度 | 重排基本块 |
 | fall-through | 顺序落下 | 不跳转直接执行下一条 |
 | side effect | 副作用 | 影响求值顺序 |
 | commute | 可交换 | 判断语句和表达式能否换序 |
 | conditional branch | 条件分支 | 机器条件跳转 |
 | false label | 假分支标签 | CJUMP 的 false target |
-
