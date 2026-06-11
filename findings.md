@@ -43,3 +43,9 @@
 - 本地 `materials/ch3 语法分析-2(TD).pdf` 后半部分继续覆盖：表驱动 LL(1) 示例、递归下降代码实现、FIRST/FOLLOW 何时用于选择分支、LL(1) 文法无二义性/无左递归/无左公因子、提左公因子、消除直接左递归、错误恢复目标、空表项报错、insert token 与 delete/skip token 到 FOLLOW 集的取舍。
 - 虎书 predictive parsing 小节覆盖：递归下降函数、nullable/FIRST/FOLLOW、Algorithm 3.13、predictive parsing table、LL(1) 含义、左递归消除、提左公因子、error recovery。
 - `04_LL1_自顶向下分析.md` 已按教材/PPT顺序补强本章边界、递归下降回溯动机、FIRST 右部串含义、FOLLOW 不含 epsilon、空表项/冲突表项、栈模拟压栈顺序、LL(1) 快速排除性质、错误恢复策略对比和 PPT 覆盖核对。
+
+## 第 05 章补强依据
+
+- 本地 `materials/ch3 语法分析-3(BU)-LR(0)SLR(1).pdf` 共 98 页，PPT 主线包括：LL(1) 局限与 LR(k) 表达力、shift-reduce 分界点模型、最右推导的逆过程、LR 表驱动程序、LR(0) item 表示 RHS 识别进度、LR(0) NFA 直觉、NFA 到 DFA/项集族、closure/goto、从 DFA 填 ACTION/GOTO、状态栈算法、完整 LR(0) 分析示例、LR(0) 中 `0` 的含义、LR(0) 冲突、SLR 用 FOLLOW 集限制 reduce、SLR 仍可能冲突。
+- 虎书 LR parsing 小节对应内容包括：状态栈表驱动算法、LR(0) parser generation、closure/goto、增广文法 `S' -> S$`、`$` 不计算 goto 而产生 accept、LR(0) 完整项在所有 token 上 reduce、SLR 只在 FOLLOW 集上填 reduce。
+- `05_LR0_SLR_自底向上分析.md` 已按教材/PPT顺序补强本章边界、shift-reduce 分界点与最右推导逆过程、handle/viable prefix、LR(0) item 中 `0` 的含义、LR(0) NFA 到 DFA 直觉、`$`/accept 边界、ACTION/GOTO 填表检查清单、epsilon 规约栈规则、SLR 手算流程、SLR 局限和 PPT 覆盖核对。

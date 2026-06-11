@@ -37,3 +37,12 @@
 - 本地验证通过：`python3 -m unittest tests/test_reader_server.py` 8 个测试通过，Markdown 表格结构检查通过，`git diff --check` 无输出。
 - 已提交并推送第 04 章补强：`d206198 Deepen LL1 notes for exam scope`。
 - 已部署 `d206198` 到服务器；服务器端阅读器测试 8 个通过，`compiler-review-notes.service` 为 active，公网第 04 章页面已验证包含“本章只学到哪里”“本章覆盖核对”等新增内容。
+
+## 2026-06-12
+
+- 恢复长期计划，确认当前方向仍是按教材/PPT章节顺序推进，下一章为 LR(0)/SLR 自底向上分析。
+- 抽取 `materials/ch3 语法分析-3(BU)-LR(0)SLR(1).pdf` 全部 98 页摘要，确认 PPT 主线包括 shift-reduce 分界点模型、最右推导逆过程、LR(0) item/NFA/DFA、closure/goto、ACTION/GOTO、状态栈算法、LR(0) 局限、SLR 用 FOLLOW 限制 reduce。
+- 抽取虎书 LR parsing 对应页，确认状态栈算法、增广文法、`$`/accept、LR(0) 与 SLR 填表规则的教材表述。
+- 补强 `05_LR0_SLR_自底向上分析.md`：新增本章边界、shift-reduce 分界点、handle/viable prefix、LR(0) 中 `0` 的含义、LR(0) NFA 到 DFA 直觉、EOF/accept 边界、ACTION/GOTO 填表检查清单、epsilon 规约栈规则、SLR 流程与局限、PPT 覆盖核对。
+- 更新 `task_plan.md` 和 `findings.md`，记录第 05 章已按 PPT/考试范围补强，下一步转向第 06 章 LR(1)/LALR/Yacc。
+- 本地验证通过：`python3 -m unittest tests/test_reader_server.py` 8 个测试通过，Markdown 表格结构检查通过，`git diff --check` 无输出。
