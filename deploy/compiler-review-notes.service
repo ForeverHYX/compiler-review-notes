@@ -1,0 +1,15 @@
+[Unit]
+Description=Compiler Review Notes Reader
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/compiler-review-notes
+ExecStart=/usr/bin/python3 /opt/compiler-review-notes/reader_server.py --host 127.0.0.1 --port 8010 --base-path /compiler-notes
+Restart=always
+RestartSec=3
+User=root
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

@@ -20,3 +20,5 @@
 - 已提交并推送第一批更新到 GitHub：`8fa74bc Add browser reader and deepen lexical notes`。
 - 服务器检查结果：`root@116.62.147.239` 有 Python/Git/systemd/nginx；现有 `127.0.0.1:8000` 被主页 API gunicorn 占用，不能作为阅读器端口。
 - 为服务器部署新增阅读器 `--base-path` 支持，目标是在现有域名下以 `/compiler-notes/` 子路径代理到阅读器服务。
+- 服务器无法无凭据从 GitHub HTTPS clone 私有仓库；改用本机 `git archive` 打包当前提交，通过 scp 上传到 `/tmp` 并解压到 `/opt/compiler-review-notes`。
+- 服务器 `/opt/compiler-review-notes` 已运行 `python3 -m unittest tests/test_reader_server.py`，8 个测试通过。
