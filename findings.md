@@ -3,7 +3,7 @@
 ## 仓库现状
 
 - 根目录已有 `00` 到 `24` 共 25 个 Markdown 复习文件，以及 `README.md`。
-- `materials/` 包含课程 PPT 和虎书 PDF；`materials/README.md` 当前列到 ch14，未列出已存在的 `ch18 循环优化.pdf`。
+- `materials/` 包含课程 PPT 和虎书 PDF；`materials/README.md` 已补列 `ch18 循环优化.pdf`。
 - 已新增 `reader_server.py` 和 `tests/test_reader_server.py`，实现无外部依赖的本地阅读器与单元测试。
 - `22_覆盖审计与补强说明.md` 已记录：主线为 ch1-ch14 和 ch18，ch15-ch17/ch19-ch21 作为拓展速读。
 - `23_练习参考答案.md` 已集中放置参考答案；浏览器阅读器需要把这些答案映射到对应练习位置，提供就地展开。
@@ -12,7 +12,7 @@
 ## 工作区状态
 
 - `02_词法分析_RE_NFA_DFA_Lex.md` 原先在 `id = letter (letter | digit)*` 附近的 `=` 和空行残留已修正，并在同章完成初学者向扩充。
-- `materials/ch18 循环优化.pdf` 是未跟踪文件，但与目标一致，应在材料清单和覆盖审计中纳入。
+- `materials/ch18 循环优化.pdf` 已纳入材料清单和覆盖审计；第 18 章应按该 PPT 主线复习，而不是只按“教学计划补齐”处理。
 
 ## 待进一步审计
 
@@ -127,3 +127,10 @@
 - PPT 中多继承主线包括：prefixing strategy 无法同时满足多个父类、field layout 可用 whole-program graph coloring，直接把 color 当 object slot 可能让 object 出现 empty slots；descriptor coloring 让 objects compact，但 descriptor 可能有空槽，field access 需要 descriptor 间接；dynamic loading 会破坏 whole-program coloring，hashing/Ktab/Ftab 是替代思路。
 - PPT 中 membership/private/optimization 主线包括：linear search、class display、bit vector、Cohen encoding 等 membership test；private fields/methods 主要由 type checker 检查，private methods 不能 override，private fields 仍在布局中；OO optimization 重点是 devirtualization、inlining、inline cache、final/sealed classes。
 - `17_面向对象语言.md` 已按 PPT/教材顺序补强本章边界、Object-Tiger 语法、class hierarchy、single-inheritance object/vtable layout、static/dynamic dispatch、multiple-inheritance graph coloring/hash、membership test、private fields/methods、classless languages、OO optimization、判断题高频点和手算模板。
+
+## 第 18 章补强依据
+
+- 本地 `materials/ch18 循环优化.pdf` 共 52 页，PPT 主线包括：loop optimization 总览、loop 的 CFG 定义、header/entry/exit、cycle 不一定是 loop、reducible/irreducible graph、dominator、dominator 迭代算法、immediate dominator、dominator tree、back edge、natural loop、nested loop、loop-nest tree、loop preheader、loop-invariant computation 和 safe hoisting。
+- 虎书 Loop Optimizations 章节对应内容包括：精确定义 loop、irreducible flow graph、dominators 和不可达节点 caveat、natural loops、same-header loops 合并、nested loops、loop-nest tree、loop-invariant computations 的迭代识别、hoisting 安全条件、induction variables、strength reduction、bounds-check elimination、loop unrolling 和 epilogue。
+- LLVM 官方 Loop Terminology 文档用于外部校验术语：natural loop、header、latch/backedge、preheader、loop simplify form、irreducible control-flow 的工程术语与本章 PPT/教材主线一致：<https://llvm.org/docs/LoopTerminology.html>
+- `18_循环优化_教学计划补齐.md` 已按 PPT/教材顺序补强本章边界、loop vs cycle、reducible graph、dominator 手算、natural loop 构造、nested loop/loop-nest tree、preheader、loop-invariant 识别、safe hoisting 三条件、loop variant 回忆卷题型、induction variable、strength reduction、bounds-check elimination、loop unrolling、弱化优化名词和判断题高频点。

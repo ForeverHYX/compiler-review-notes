@@ -124,3 +124,10 @@
 - 本地验证通过：`python3 -m unittest tests/test_reader_server.py` 8 个测试通过，Markdown 表格结构检查通过，`git diff --check` 无输出。
 - 已提交并推送第 17 章补强：`0e9b070 Deepen object oriented language notes for exam scope`。
 - 已部署 `0e9b070` 到服务器；服务器端阅读器测试 8 个通过，`compiler-review-notes.service` 为 active，服务器本地抓取第 17 章页面包含“本章只学到哪里”“Dynamic Dispatch 与 VTable”“Direct Coloring on Objects 会有空槽”“Membership Test”和 `data-answer-key="chapter-17"`。
+- 补记第 17 章部署进度后，本地验证通过：阅读器单测 8 个通过，Markdown 表格结构检查通过，`git diff --check` 无输出；已提交并推送 `cb0cf50 Record object oriented language deployment progress`。
+- 已部署 `cb0cf50` 到服务器；服务器端阅读器测试 8 个通过，`compiler-review-notes.service` 为 active，服务器本地抓取第 17 章页面包含新增标题和 `data-answer-key="chapter-17"`。
+- 继续推进第 18 章循环优化：抽取 `materials/ch18 循环优化.pdf` 共 52 页，确认之前“没有对应 PPT”的表述已经过时；第 18 章应按实际 PPT 主线处理。
+- 抽取虎书 Loop Optimizations 章节对应页，确认教材主线包括 loop 定义、irreducible flow graph、dominators、natural loops、loop-nest tree、LICM、induction variables、bounds checks 和 loop unrolling；使用 LLVM 官方 Loop Terminology 文档校验 header/preheader/latch/backedge/irreducible 等术语。
+- 补强 `18_循环优化_教学计划补齐.md`：按 PPT/教材顺序重写本章，新增本章边界、loop vs cycle、reducible/irreducible、entry/exit/header、dominator 迭代、idom/dominator tree、back edge、natural loop 构造、nested loop、loop-nest tree、preheader、loop-invariant 识别、safe hoisting 三条件、loop variant 回忆卷题型、induction variables、strength reduction、bounds-check elimination、loop unrolling、弱化优化名词、判断题高频点和 PPT 覆盖核对。
+- 同步更新 `23_练习参考答案.md` 第 18 章答案，使新增的 cycle vs loop、preheader、safe hoisting 三条件、strength reduction、bounds check 和 unrolling 练习与题号对齐。
+- 修正 `00_复习路线与课程覆盖.md` 和 `findings.md` 中关于 ch18 没有课件/材料清单未列出的旧表述。
