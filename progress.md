@@ -75,3 +75,6 @@
 - 继续推进第 10 章 IR Tree 与中间代码生成：抽取 `materials/ch7 中间表示生成.pdf` 共 81 页，并抽取虎书 Translation to Intermediate Code 对应页，确认 PPT/教材主线包括 IR 分类、三地址码、IR Tree 节点、Ex/Nx/Cx、patch list、static link 变量访问、l-value/r-value、array/record 指针模型、conditionals、while/for、function call、declaration、function prologue/body/epilogue 和 fragments。
 - 补强 `10_IR_Tree_中间代码生成.md`：新增本章边界、IR 分类和三地址码对照、`NAME`/`LABEL` 区别、`ESEQ` 和 side effect、`Ex/Nx/Cx` 转换细节、patch list/backpatching、`F_Exp` 与 static link 访问、l-value/r-value、Tiger array/record pointer assignment、string equality/runtime call、for 循环 `maxint` 细节、record/array/string 翻译、declaration 翻译、function declaration 1-11 步和 PPT 覆盖核对。
 - 更新 `task_plan.md` 和 `findings.md`，记录第 10 章已按 PPT/考试范围补强，下一步转向第 11 章规范化、基本块与 Trace。
+- 本地验证通过：`python3 -m unittest tests/test_reader_server.py` 8 个测试通过，Markdown 表格结构检查通过，`git diff --check` 无输出。
+- 已提交并推送第 10 章补强：`287125d Deepen IR tree notes for exam scope`。
+- 已部署 `287125d` 到服务器；服务器端阅读器测试 8 个通过，`compiler-review-notes.service` 为 active，SSH 检查服务器文件包含第 10 章新增标题。公网 `curl` 仍受沙箱 DNS/审批服务限制，本轮以服务器侧验证为准。
