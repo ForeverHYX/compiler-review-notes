@@ -106,3 +106,9 @@
 - 本地 `materials/ch11 寄存器分配2.pdf` 共 73 页，PPT 主线包括：move 指令特殊建边、coalescing、Briggs criterion、George criterion、optimized algorithm with move coalescing、freeze、constrained move、precolored nodes、precolored coalescing、caller-save/callee-save 建模、spill priority 公式和 K=3 综合例子。
 - 虎书 Register Allocation 章节对应内容包括：图着色寄存器分配、低度节点 simplify、select stack、spill cost、actual spill 后插入 load/store 并重建程序、move coalescing、Briggs/George conservative coalescing、precolored nodes、调用约定寄存器建模和迭代式分配流程。
 - `14_寄存器分配.md` 已按教材/PPT顺序补强本章边界、interference graph 建图、move 特殊规则、K-coloring、Kempe theorem、simplify/select、optimistic coloring、potential/actual spill、spill priority、Briggs/George、constrained move、iterated register coalescing、freeze、precolored nodes、caller-save/callee-save、大题模板和判断题高频点。
+
+## 第 15 章补强依据
+
+- 本地 `materials/ch1 简介.pdf` 共 56 页，PPT 主线中“编译器的阶段”和“TIGER 编译器流程”覆盖：编译器定义、广义/狭义目标语言、预处理器/编译器/汇编器/链接器、JIT/AOT、前端/中端/后端、词法/语法/语义/IR/优化/目标代码生成，以及 Tiger 的 AST、IRTree、Canonicalized IRTree、Assem、CFG、InterferenceGraph 串联。
+- 虎书 Introduction 的 Figure 1.1 和 Table 1.2 覆盖完整 compiler phases and interfaces：Source Program、Tokens、Abstract Syntax、Frame、IR Trees、Assem、Flow Graph、Interference Graph、Register Assignment、Code Emission，并强调每个阶段通过数据结构或抽象接口模块化连接。
+- `15_完整编译器串联.md` 已按教材/PPT顺序补强本章边界、总流水线、每阶段输入输出、front/middle/back end、Token-AST、semantic environment、Frame/Level/Access、fragments、canonical tree、abstract assembly、liveness/regalloc 闭环、`procEntryExit`、code emission、runtime library、debug 定位表和小程序串联答题模板。

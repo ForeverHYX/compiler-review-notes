@@ -102,3 +102,9 @@
 - 本地验证通过：`python3 -m unittest tests/test_reader_server.py` 8 个测试通过，Markdown 表格结构检查通过，`git diff --check` 无输出。
 - 已提交并推送第 14 章补强：`bc66eef Deepen register allocation notes for exam scope`。
 - 已部署 `bc66eef` 到服务器；服务器端阅读器测试 8 个通过，`compiler-review-notes.service` 为 active，服务器本地抓取第 14 章页面包含“本章只学到哪里”“Briggs Criterion”“Freeze 的精确定义”“Caller-Save Registers”和 `data-answer-key="chapter-14"`。
+- 用户要求继续修完所有笔记；恢复计划后确认 02-14 已补强，下一章为第 15 章完整编译器串联。
+- 审计 15-24 章时发现一次命令使用了不存在的旧文件名 `18_循环优化.md`；实际文件名是 `18_循环优化_教学计划补齐.md`，后续审计按真实文件名处理。
+- 抽取 `materials/ch1 简介.pdf` 编译器阶段/Tiger 流程页，并抽取虎书 Introduction 的 Figure 1.1/Table 1.2 对应页，确认第 15 章应作为完整 compiler phases and interfaces 的串联复习章。
+- 补强 `15_完整编译器串联.md`：新增本章边界、总流水线、阶段输入输出、front/middle/back end、Token/AST、semantic environment、Frame/Level/Access、fragments、canonical tree、abstract assembly、liveness/regalloc 闭环、`procEntryExit`、code emission、runtime library、debug 定位表、贯穿例子和覆盖核对。
+- 同步更新 `23_练习参考答案.md` 第 15 章答案，使新增的 actual spill 闭环、call use/def 和 IR 降低 `N*M` 成本等练习与题号对齐。
+- 本地验证通过：`python3 -m unittest tests/test_reader_server.py` 8 个测试通过，Markdown 表格结构检查通过，`git diff --check` 无输出。
