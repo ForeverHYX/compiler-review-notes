@@ -57,6 +57,32 @@ class ReaderServerTests(unittest.TestCase):
         self.assertIn("02_词法分析_RE_NFA_DFA_Lex.md", html)
         self.assertIn("ch18 循环优化.pdf", html)
 
+    def test_base_path_prefixes_reader_links(self):
+        notes = reader_server.discover_notes(ROOT)
+        index = reader_server.load_answer_index(ROOT)
+
+        html = reader_server.render_home_page(ROOT, notes, index, base_path="/compiler-notes")
+
+        self.assertIn("/compiler-notes/note/02_", html)
+        self.assertIn("/compiler-notes/materials/ch18", html)
+
+    def test_base_path_prefixes_markdown_links(self):
+        html = reader_server.markdown_to_html(
+            "见 [答案](23_练习参考答案.md) 和 [材料](materials/ch18 循环优化.pdf)",
+            base_path="/compiler-notes",
+        )
+
+        self.assertIn('href="/compiler-notes/note/23_', html)
+        self.assertIn('href="/compiler-notes/materials/ch18', html)
+
+    def test_base_path_prefixes_table_links(self):
+        html = reader_server.markdown_to_html(
+            "| 文件 | 内容 |\n|---|---|\n| [答案](23_练习参考答案.md) | ok |",
+            base_path="/compiler-notes",
+        )
+
+        self.assertIn('href="/compiler-notes/note/23_', html)
+
 
 if __name__ == "__main__":
     unittest.main()

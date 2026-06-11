@@ -120,18 +120,33 @@ def split_question_answers(section_text: str) -> dict[int, str]:
     return questions
 
 
-def render_home_page(root: Path, notes: list[Note], answer_index: AnswerIndex) -> str:
+def normalize_base_path(base_path: str) -> str:
+    if not base_path or base_path == "/":
+        return ""
+    base = "/" + base_path.strip("/")
+    return base
+
+
+def prefixed_path(base_path: str, path: str) -> str:
+    base = normalize_base_path(base_path)
+    if not path.startswith("/"):
+        path = "/" + path
+    return base + path
+
+
+def render_home_page(root: Path, notes: list[Note], answer_index: AnswerIndex, base_path: str = "") -> str:
+    base_path = normalize_base_path(base_path)
     material_items = []
     materials_dir = root / "materials"
     if materials_dir.exists():
         for path in sorted(materials_dir.glob("*")):
             if path.is_file():
-                href = "/materials/" + quote(path.name)
+                href = prefixed_path(base_path, "/materials/" + quote(path.name))
                 material_items.append(f'<li><a href="{href}">{html.escape(path.name)}</a></li>')
 
     note_items = []
     for note in notes:
-        href = "/note/" + quote(note.filename)
+        href = prefixed_path(base_path, "/note/" + quote(note.filename))
         answer_badge = ""
         if note.number in answer_index.chapter_answers and note.filename != ANSWER_FILE:
             answer_badge = '<span class="badge">答案可展开</span>'
@@ -159,27 +174,28 @@ def render_home_page(root: Path, notes: list[Note], answer_index: AnswerIndex) -
       </ul>
     </section>
     """
-    return page_template("编译原理期末复习教程", body, notes)
+    return page_template("编译原理期末复习教程", body, notes, base_path=base_path)
 
 
-def render_note_page(root: Path, note: Note, answer_index: AnswerIndex) -> str:
+def render_note_page(root: Path, note: Note, answer_index: AnswerIndex, base_path: str = "") -> str:
+    base_path = normalize_base_path(base_path)
     markdown = note.path.read_text(encoding="utf-8")
-    markdown = inject_answer_drawers(markdown, note, answer_index)
+    markdown = inject_answer_drawers(markdown, note, answer_index, base_path=base_path)
     body = f"""
     <article class="note">
-      {markdown_to_html(markdown)}
+      {markdown_to_html(markdown, base_path=base_path)}
     </article>
     """
-    return page_template(note.title, body, discover_notes(root), current=note.filename)
+    return page_template(note.title, body, discover_notes(root), current=note.filename, base_path=base_path)
 
 
-def inject_answer_drawers(markdown: str, note: Note, answer_index: AnswerIndex) -> str:
+def inject_answer_drawers(markdown: str, note: Note, answer_index: AnswerIndex, base_path: str = "") -> str:
     if note.filename == ANSWER_FILE:
         return markdown
 
     if note.number == "20":
         answers = answer_index.comprehensive_answers.get("20", {})
-        return inject_comprehensive_answer_drawers(markdown, answers)
+        return inject_comprehensive_answer_drawers(markdown, answers, base_path=base_path)
 
     answer = answer_index.chapter_answers.get(note.number)
     if not answer:
@@ -189,6 +205,7 @@ def inject_answer_drawers(markdown: str, note: Note, answer_index: AnswerIndex) 
         key=f"chapter-{note.number}",
         label="显示本章练习参考答案",
         answer_markdown=strip_leading_heading(answer, level=2),
+        base_path=base_path,
     )
     pattern = re.compile(
         r"\n##\s+练习参考答案\s*\n+见\s+\[23_练习参考答案\.md\]\(23_练习参考答案\.md\)\s+中对应章节。\s*",
@@ -200,7 +217,7 @@ def inject_answer_drawers(markdown: str, note: Note, answer_index: AnswerIndex) 
     return markdown + "\n\n" + drawer
 
 
-def inject_comprehensive_answer_drawers(markdown: str, answers: dict[int, str]) -> str:
+def inject_comprehensive_answer_drawers(markdown: str, answers: dict[int, str], base_path: str = "") -> str:
     lines: list[str] = []
     for line in markdown.splitlines():
         lines.append(line)
@@ -215,6 +232,7 @@ def inject_comprehensive_answer_drawers(markdown: str, answers: dict[int, str]) 
                     key=f"q-{number}",
                     label=f"显示题 {number} 参考答案",
                     answer_markdown=strip_leading_heading(answer, level=3),
+                    base_path=base_path,
                 )
             )
 
@@ -236,8 +254,8 @@ def strip_leading_heading(markdown: str, level: int) -> str:
     return markdown.strip()
 
 
-def make_answer_drawer(key: str, label: str, answer_markdown: str) -> str:
-    answer_html = markdown_to_html(answer_markdown)
+def make_answer_drawer(key: str, label: str, answer_markdown: str, base_path: str = "") -> str:
+    answer_html = markdown_to_html(answer_markdown, base_path=base_path)
     return (
         f'<details class="answer-drawer" data-answer-key="{html.escape(key)}">'
         f"<summary>{html.escape(label)}</summary>"
@@ -246,7 +264,7 @@ def make_answer_drawer(key: str, label: str, answer_markdown: str) -> str:
     )
 
 
-def markdown_to_html(markdown: str) -> str:
+def markdown_to_html(markdown: str, base_path: str = "") -> str:
     lines = markdown.splitlines()
     blocks: list[str] = []
     index = 0
@@ -284,7 +302,7 @@ def markdown_to_html(markdown: str) -> str:
             while index < len(lines) and lines[index].strip().startswith("|"):
                 table_lines.append(lines[index])
                 index += 1
-            blocks.append(render_table(table_lines))
+            blocks.append(render_table(table_lines, base_path=base_path))
             continue
 
         heading = re.match(r"^(#{1,6})\s+(.+)$", line)
@@ -292,7 +310,7 @@ def markdown_to_html(markdown: str) -> str:
             level = len(heading.group(1))
             text = heading.group(2).strip()
             anchor = slugify(text)
-            blocks.append(f'<h{level} id="{anchor}">{render_inline(text)}</h{level}>')
+            blocks.append(f'<h{level} id="{anchor}">{render_inline(text, base_path=base_path)}</h{level}>')
             index += 1
             continue
 
@@ -303,7 +321,7 @@ def markdown_to_html(markdown: str) -> str:
                 item = re.match(r"^\s*[-*]\s+(.+)$", lines[index])
                 if not item:
                     break
-                items.append(f"<li>{render_inline(item.group(1).strip())}</li>")
+                items.append(f"<li>{render_inline(item.group(1).strip(), base_path=base_path)}</li>")
                 index += 1
             blocks.append("<ul>" + "".join(items) + "</ul>")
             continue
@@ -315,7 +333,7 @@ def markdown_to_html(markdown: str) -> str:
                 item = re.match(r"^\s*\d+\.\s+(.+)$", lines[index])
                 if not item:
                     break
-                items.append(f"<li>{render_inline(item.group(1).strip())}</li>")
+                items.append(f"<li>{render_inline(item.group(1).strip(), base_path=base_path)}</li>")
                 index += 1
             blocks.append("<ol>" + "".join(items) + "</ol>")
             continue
@@ -334,7 +352,7 @@ def markdown_to_html(markdown: str) -> str:
                 break
             paragraph_lines.append(next_line.strip())
             index += 1
-        blocks.append(f"<p>{render_inline(' '.join(paragraph_lines))}</p>")
+        blocks.append(f"<p>{render_inline(' '.join(paragraph_lines), base_path=base_path)}</p>")
 
     return "\n".join(blocks)
 
@@ -345,16 +363,16 @@ def is_table_start(lines: list[str], index: int) -> bool:
     return lines[index].strip().startswith("|") and re.match(r"^\s*\|?\s*:?-{3,}:?\s*\|", lines[index + 1]) is not None
 
 
-def render_table(table_lines: list[str]) -> str:
+def render_table(table_lines: list[str], base_path: str = "") -> str:
     rows = [split_table_row(line) for line in table_lines if line.strip()]
     if len(rows) < 2:
-        return "<p>" + render_inline(" ".join(table_lines)) + "</p>"
+        return "<p>" + render_inline(" ".join(table_lines), base_path=base_path) + "</p>"
 
     header = rows[0]
     body_rows = rows[2:]
-    thead = "<thead><tr>" + "".join(f"<th>{render_inline(cell)}</th>" for cell in header) + "</tr></thead>"
+    thead = "<thead><tr>" + "".join(f"<th>{render_inline(cell, base_path=base_path)}</th>" for cell in header) + "</tr></thead>"
     tbody = "<tbody>" + "".join(
-        "<tr>" + "".join(f"<td>{render_inline(cell)}</td>" for cell in row) + "</tr>"
+        "<tr>" + "".join(f"<td>{render_inline(cell, base_path=base_path)}</td>" for cell in row) + "</tr>"
         for row in body_rows
     ) + "</tbody>"
     return f"<table>{thead}{tbody}</table>"
@@ -369,7 +387,7 @@ def split_table_row(line: str) -> list[str]:
     return [cell.strip() for cell in stripped.split("|")]
 
 
-def render_inline(text: str) -> str:
+def render_inline(text: str, base_path: str = "") -> str:
     escaped = html.escape(text)
 
     def link_repl(match: re.Match[str]) -> str:
@@ -377,9 +395,9 @@ def render_inline(text: str) -> str:
         target = html.unescape(match.group(2))
         href = target
         if target.endswith(".md"):
-            href = "/note/" + quote(target)
+            href = prefixed_path(base_path, "/note/" + quote(target))
         elif target.endswith(".pdf") or target.startswith("materials/"):
-            href = "/" + quote(target, safe="/")
+            href = prefixed_path(base_path, "/" + quote(target, safe="/"))
         return f'<a href="{html.escape(href)}">{label}</a>'
 
     escaped = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", link_repl, escaped)
@@ -394,12 +412,13 @@ def slugify(text: str) -> str:
     return quote(slug or "section")
 
 
-def page_template(title: str, body: str, notes: list[Note], current: str | None = None) -> str:
+def page_template(title: str, body: str, notes: list[Note], current: str | None = None, base_path: str = "") -> str:
+    base_path = normalize_base_path(base_path)
     nav_links = []
     for note in notes:
         active = " active" if note.filename == current else ""
         nav_links.append(
-            f'<a class="nav-link{active}" href="/note/{quote(note.filename)}">'
+            f'<a class="nav-link{active}" href="{prefixed_path(base_path, "/note/" + quote(note.filename))}">'
             f'<span>{html.escape(note.number)}</span>{html.escape(note.title)}</a>'
         )
 
@@ -523,7 +542,7 @@ def page_template(title: str, body: str, notes: list[Note], current: str | None 
 <body>
   <div class="layout">
     <aside>
-      <a class="brand" href="/">编译原理复习</a>
+      <a class="brand" href="{prefixed_path(base_path, "/")}">编译原理复习</a>
       <nav>{''.join(nav_links)}</nav>
     </aside>
     <main>{body}</main>
@@ -534,28 +553,51 @@ def page_template(title: str, body: str, notes: list[Note], current: str | None 
 
 class ReaderRequestHandler(BaseHTTPRequestHandler):
     root: Path
+    base_path: str = ""
 
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
+        path = self.strip_base_path(parsed.path)
+        if path is None:
+            self.send_error(404, "not found")
+            return
         try:
-            if parsed.path == "/":
-                self.respond_html(render_home_page(self.root, discover_notes(self.root), load_answer_index(self.root)))
+            if path == "/":
+                self.respond_html(
+                    render_home_page(
+                        self.root,
+                        discover_notes(self.root),
+                        load_answer_index(self.root),
+                        base_path=self.base_path,
+                    )
+                )
                 return
-            if parsed.path.startswith("/note/"):
-                filename = unquote(parsed.path.removeprefix("/note/"))
+            if path.startswith("/note/"):
+                filename = unquote(path.removeprefix("/note/"))
                 note = self.find_note(filename)
                 if note is None:
                     self.send_error(404, "note not found")
                     return
-                self.respond_html(render_note_page(self.root, note, load_answer_index(self.root)))
+                self.respond_html(render_note_page(self.root, note, load_answer_index(self.root), base_path=self.base_path))
                 return
-            if parsed.path.startswith("/materials/"):
-                filename = unquote(parsed.path.removeprefix("/materials/"))
+            if path.startswith("/materials/"):
+                filename = unquote(path.removeprefix("/materials/"))
                 self.respond_file(self.root / "materials" / filename)
                 return
             self.send_error(404, "not found")
         except OSError as exc:
             self.send_error(500, str(exc))
+
+    def strip_base_path(self, request_path: str) -> str | None:
+        base = normalize_base_path(self.base_path)
+        if not base:
+            return request_path
+        if request_path == base:
+            return "/"
+        if request_path.startswith(base + "/"):
+            stripped = request_path[len(base):]
+            return stripped or "/"
+        return None
 
     def find_note(self, filename: str) -> Note | None:
         for note in discover_notes(self.root):
@@ -592,10 +634,15 @@ class ReaderRequestHandler(BaseHTTPRequestHandler):
         print(f"{self.address_string()} - {format % args}")
 
 
-def run_server(root: Path, host: str, port: int) -> None:
-    handler = type("ConfiguredReaderRequestHandler", (ReaderRequestHandler,), {"root": root.resolve()})
+def run_server(root: Path, host: str, port: int, base_path: str = "") -> None:
+    handler = type(
+        "ConfiguredReaderRequestHandler",
+        (ReaderRequestHandler,),
+        {"root": root.resolve(), "base_path": normalize_base_path(base_path)},
+    )
     server = ThreadingHTTPServer((host, port), handler)
-    print(f"Serving compiler review notes at http://{host}:{port}")
+    path = normalize_base_path(base_path) or "/"
+    print(f"Serving compiler review notes at http://{host}:{port}{path}")
     server.serve_forever()
 
 
@@ -604,8 +651,9 @@ def main() -> None:
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parent)
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8000)
+    parser.add_argument("--base-path", default="")
     args = parser.parse_args()
-    run_server(args.root, args.host, args.port)
+    run_server(args.root, args.host, args.port, base_path=args.base_path)
 
 
 if __name__ == "__main__":

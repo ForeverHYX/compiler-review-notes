@@ -17,3 +17,6 @@
 - 本地阅读器端口验证受沙箱限制：沙箱内客户端连接 `127.0.0.1:8000` 报 `Operation not permitted`；非沙箱 curl/kill 请求被审批服务 503 拒绝。已确认 PID 89651 在端口 8000 监听，但无法在本轮自动 HTTP 抓取页面。
 - 增加 `.gitignore` 忽略 Python `__pycache__` 和 `.pyc`，避免测试运行产物进入提交。
 - 更新 `README.md`，加入本地阅读器启动命令、访问地址和答案展开说明。
+- 已提交并推送第一批更新到 GitHub：`8fa74bc Add browser reader and deepen lexical notes`。
+- 服务器检查结果：`root@116.62.147.239` 有 Python/Git/systemd/nginx；现有 `127.0.0.1:8000` 被主页 API gunicorn 占用，不能作为阅读器端口。
+- 为服务器部署新增阅读器 `--base-path` 支持，目标是在现有域名下以 `/compiler-notes/` 子路径代理到阅读器服务。
