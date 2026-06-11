@@ -119,3 +119,11 @@
 - 本地 `materials/ch13 垃圾回收-2.pdf` 共 105 页，PPT 主线包括：copying collection、from-space/to-space、fast allocation、Cheney algorithm、pointer forwarding、BFS queue 的 scan/next、不复制死对象、locality、copying collection 优缺点、compiler interface、fast allocation 优化、pointer map/stack map、type descriptor、derived pointers，以及 pointer/non-pointer 信息贯穿 type checking、temp、spill slot、register allocation 和 code emission。
 - 虎书 Garbage Collection 章节对应内容包括：garbage 的 reachability 近似、mark-and-sweep 算法、reference counts 和循环垃圾、copying collection/forwarding/Cheney、generational/incremental 概念、interface to the compiler；本课件明确 generational/incremental 书上有但不考算法细节。
 - `16_垃圾回收.md` 已按 PPT/教材顺序补强本章边界、roots/reachability、freelist、mark-and-sweep、成本公式、explicit stack/pointer reversal、fragmentation、reference counting、copying collection、forwarding pointer、Cheney 手算、compiler interface、pointer map/type descriptor、safe point、derived pointer、弱化内容速记和判断/选择题高频点。
+
+## 第 17 章补强依据
+
+- 本地 `materials/ch14 面向对象语言.pdf` 共 52 页，PPT 主线包括：Object-Tiger 的 `class/extends/var/method/new` 语法、`self` 隐式参数、inheritance/encapsulation/polymorphism、single inheritance tree 与 multiple inheritance DAG、field layout、method dispatch、membership test 三个编译问题。
+- PPT 中单继承主线包括：父类字段 prefix layout、inherited field offset 稳定、method instance 像普通函数编译、static dispatch 根据 declared type 直接调用、dynamic dispatch 通过 object offset 0 的 class descriptor/vtable 做 2 次 load 加 indirect call，override 必须保持 method slot。
+- PPT 中多继承主线包括：prefixing strategy 无法同时满足多个父类、field layout 可用 whole-program graph coloring，直接把 color 当 object slot 可能让 object 出现 empty slots；descriptor coloring 让 objects compact，但 descriptor 可能有空槽，field access 需要 descriptor 间接；dynamic loading 会破坏 whole-program coloring，hashing/Ktab/Ftab 是替代思路。
+- PPT 中 membership/private/optimization 主线包括：linear search、class display、bit vector、Cohen encoding 等 membership test；private fields/methods 主要由 type checker 检查，private methods 不能 override，private fields 仍在布局中；OO optimization 重点是 devirtualization、inlining、inline cache、final/sealed classes。
+- `17_面向对象语言.md` 已按 PPT/教材顺序补强本章边界、Object-Tiger 语法、class hierarchy、single-inheritance object/vtable layout、static/dynamic dispatch、multiple-inheritance graph coloring/hash、membership test、private fields/methods、classless languages、OO optimization、判断题高频点和手算模板。
