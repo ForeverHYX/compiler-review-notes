@@ -36,6 +36,32 @@ IF LPAREN ID(i) EQ ID(j) RPAREN ID(print) LPAREN STRING("equal") RPAREN SEMI
 - 工具题：能判断 Lex/Flex 中最长匹配和规则优先级的结果。
 - 英文题：看到 `Thompson construction`、`subset construction`、`transition function`、`accepting state` 能知道要写什么。
 
+## 初学者阅读路线
+
+本章容易看懂概念，却在做题时混乱。建议按下面顺序建立心智模型：
+
+```text
+1. 先把词法分析看成“切字符串”
+   输入: if (i == j)
+   输出: IF LPAREN ID EQ ID RPAREN
+
+2. 再学正则表达式
+   目标: 用数学方式描述每类 token 的 lexeme 集合
+
+3. 再学 NFA
+   目标: 让“选择、重复、可空”可以直接画成图
+
+4. 再学 DFA
+   目标: 让机器扫描时每读一个字符只有一个确定状态
+
+5. 最后学 Lex/Flex
+   目标: 多条 token 规则同时生效时，决定切哪里、返回哪类 token
+```
+
+最重要的一句话：**RE/NFA/DFA 解决“某个字符串是否属于某个模式”，lexer 解决“从当前位置切下一个最长 token”。** 这两个问题相关，但不是同一个问题。
+
+本地课件 `ch2 词法分析.pdf` 的结构也基本如此：先讲 lexical analysis 概述，再讲形式语言和 RE，再讲 DFA/NFA，最后讲 RE 到 NFA、NFA 到 DFA、DFA 简化和 Lex 工具。虎书第 2 章对应 `Lexical tokens`、`Regular expressions`、`Finite automata`、`Nondeterministic finite automata`、`Lex` 五个小节。
+
 ## Token、Lexeme、Pattern
 
 | 概念 | 解释 | 例子 |
@@ -69,6 +95,56 @@ IF("if") ID("count") NUM("123")
 ```
 
 很多教材会省略括号里的 lexeme，只写 `IF ID NUM`。但实现编译器时，`ID` 和 `NUM` 往往必须带属性值：`ID` 要告诉后续阶段名字是什么，`NUM` 要告诉后续阶段数值是多少。
+
+### Token 不是只有一个名字
+
+一个真实 token 通常至少有三类信息：
+
+| 信息 | 例子 | 后续阶段为什么需要 |
+|---|---|---|
+| token kind | `ID`、`NUM`、`IF` | parser 用它判断语法结构 |
+| lexeme 或 literal value | `count`、`123` | 语义分析要查名字，常量折叠要知道数值 |
+| source position | 第 3 行第 8 列 | 报错时指出位置 |
+
+所以可以把 token 想成一个小 record：
+
+```text
+Token {
+  kind: ID,
+  lexeme: "count",
+  value: optional,
+  position: line/column or byte offset
+}
+```
+
+这也解释了为什么 `ID(x)` 和 `ID(y)` 对 parser 来说都是 `ID`，但对语义分析来说不能丢掉 `x/y` 这个名字。
+
+### 从字符流到 token 流：手动扫描一遍
+
+输入：
+
+```c
+if (count == 10) count = count + 1;
+```
+
+词法分析器从左到右扫描：
+
+| 起点 | 看见的字符 | 决策 | 输出 |
+|---|---|---|---|
+| 0 | `if` 后面是空格 | `if` 是关键字 | `IF` |
+| 3 | `(` | 单字符分隔符 | `LPAREN` |
+| 4 | `count` | 字母开头，继续吃字母数字 | `ID("count")` |
+| 10 | `==` | 两字符运算符比单个 `=` 更长 | `EQ` |
+| 13 | `10` | 数字串 | `NUM(10)` |
+| 15 | `)` | 单字符分隔符 | `RPAREN` |
+| 17 | `count` | 标识符 | `ID("count")` |
+| 23 | `=` | 赋值号 | `ASSIGN` |
+| 25 | `count` | 标识符 | `ID("count")` |
+| 31 | `+` | 运算符 | `PLUS` |
+| 33 | `1` | 数字 | `NUM(1)` |
+| 34 | `;` | 分号 | `SEMI` |
+
+空格没有输出 token，但它仍然会影响错误定位和某些语言的布局规则。C/Tiger 这类语言通常跳过空白；Python 这类语言会把缩进变成语法相关的 token。
 
 ## 词法分析不做什么
 
@@ -166,6 +242,41 @@ a|bc*     等价于 a | (b (c*))
 ```
 
 正则表达式适合描述 token，因为 token 通常没有任意深度嵌套。任意深度括号匹配不是正则语言，这就是为什么语法分析要用 CFG，而不是继续靠 RE。
+
+### 正则定义不是程序赋值
+
+课件里会写：
+
+```text
+digit   -> 0|1|...|9
+letter_ -> A|...|Z|a|...|z|_
+id      -> letter_ (letter_ | digit)*
+```
+
+这里的 `digit`、`letter_` 只是给 RE 片段起名字，方便后面复用。它不是运行时变量，也不会在扫描时“先识别 digit 再识别 id”。真正生成 lexer 时，工具会把这些定义展开成一个整体自动机。
+
+一个实用判断：
+
+```text
+RE 定义负责 What: 什么样的字符串属于这个 token
+DFA 执行负责 How: 怎样线性扫描并快速判断
+```
+
+### 哪些东西不能只靠正则表达式
+
+正则表达式能处理“有限记忆”的模式，例如：
+
+- 标识符是否以字母开头。
+- 数字是否有小数点。
+- 注释是否从 `//` 到行尾。
+
+但它不能处理需要无界计数的结构，例如：
+
+- 任意深度的括号匹配：`((()))`。
+- `n` 个 `a` 后面必须跟 `n` 个 `b`：`a^n b^n`。
+- 嵌套语句块的成对匹配。
+
+这不是正则表达式“不够熟练”的问题，而是表达能力边界。后面语法分析用 CFG，就是为了表达这些嵌套结构。
 
 ## 有穷自动机
 
@@ -276,6 +387,52 @@ next_state = table[current_state][current_char]
 ```
 
 这就是 DFA 适合词法分析器执行的原因：扫描每个字符只做一次表查询，时间复杂度线性。
+
+### DFA 接受整个串 vs lexer 切下一个 token
+
+初学者最容易错在这里：DFA 例题通常问“字符串 `abba` 是否被 `(a|b)*abb` 接受”，这是**整串识别**；lexer 工作时问“从当前位置开始，下一段最长能切成什么 token”，这是**前缀识别**。
+
+整串识别：
+
+```text
+输入: abba
+DFA 读完整个串后如果停在终态 -> 接受
+否则 -> 拒绝
+```
+
+lexer 前缀识别：
+
+```text
+输入剩余: ifx==if
+从当前位置开始尽量多读
+记录最近一次到过的终态
+无法继续时回退到最近终态
+返回那个最长 token
+```
+
+因此 `ifx` 不会被切成 `IF NUM/ID` 之类的组合，而是整体作为 `ID(ifx)`。lexer 不会为了让前两个字符成为关键字而提前停下。
+
+可以把 lexer 的扫描状态想成：
+
+```text
+start_pos = 当前输入位置
+state = DFA start
+last_accept = none
+
+while 下一个字符有转移:
+    state = move(state, char)
+    前进一个字符
+    if state 是某条规则的接受状态:
+        last_accept = (state, 当前输入位置)
+
+if last_accept 存在:
+    回到 last_accept 的位置
+    返回对应 token
+else:
+    报词法错误
+```
+
+这个算法就是课件中 longest match 的执行版本，也是 Flex 官方手册描述的匹配原则。
 
 ## NFA vs DFA
 
@@ -651,6 +808,56 @@ user code
 | `yyleng` | 当前 lexeme 长度 |
 | `yylex()` | lexer 主函数，调用一次返回一个 token |
 
+### Lex 生成器到底帮你做了什么
+
+手写 lexer 时，你通常会写很多分支：
+
+```text
+if 当前字符是空白: 跳过
+else if 当前字符是字母: 读完整个标识符/关键字
+else if 当前字符是数字: 读完整个数字
+else if 当前字符是双引号: 读字符串
+else if 当前位置是 ==: 返回 EQ
+else if 当前位置是 =: 返回 ASSIGN
+else: 报错
+```
+
+Lex/Flex 把这件事自动化：
+
+```text
+你写: token 的正则规则 + 动作代码
+工具做: RE -> NFA -> DFA -> 转移表
+运行时: 用转移表扫描，匹配后执行动作代码
+```
+
+这就是虎书和课件强调“Program = Specification + Implementation”的原因：词法规则是声明式 specification，生成工具把它变成可执行 implementation。
+
+### 关键字两种处理方式
+
+关键字和标识符有两种常见实现方式。
+
+方式 A：关键字规则写在 ID 前面。
+
+```lex
+"if"       { return IF; }
+"else"     { return ELSE; }
+{ID}       { return ID; }
+```
+
+同长度时规则优先，所以输入 `if` 返回 `IF`。但 `if8` 仍返回 `ID(if8)`，因为 ID 匹配更长。
+
+方式 B：先全当 ID，再查关键字表。
+
+```text
+读到一个 identifier lexeme
+if lexeme in keyword_table:
+    返回对应 keyword token
+else:
+    返回 ID
+```
+
+真实编译器常用方式 B，因为关键字很多时更容易维护。chibicc 的 tokenizer 就先读 identifier，再通过关键字表把部分 identifier 改成 keyword。考试如果问 Lex/Flex 规则优先级，按方式 A 判断；如果问手写 lexer，实现上两种都可以。
+
 ### 最长匹配如何实现
 
 DFA 扫描时并不是一到终态就立即返回。它会继续往后走，同时记录最近一次终态：
@@ -672,6 +879,26 @@ while transition exists:
 - 如果从未到过终态，就是词法错误。
 
 这解释了为什么 `if8` 会被识别为 `ID(if8)`：DFA 经过 `if` 时可能已经在 `IF` 终态，但继续读 `8` 后仍能停在 `ID` 终态，而且更长。
+
+### 错误处理和恢复位置
+
+词法错误一般发生在“从当前位置出发，没有任何规则能匹配一个非空前缀”。例如语言不允许 `@`：
+
+```text
+输入: x @ y
+当前位置: @
+没有 ID/NUM/operator/string/comment 规则匹配 @
+```
+
+一个可用的错误报告至少要给出：
+
+```text
+line, column, offending character
+```
+
+真实编译器还常保存 token 的 byte offset 和长度，等需要报错时再换算成行列。这样大多数正常 token 不需要提前计算复杂位置信息。
+
+错误恢复策略通常很简单：报告当前非法字符，跳过它，继续扫描后面的输入。词法阶段不应尝试修复语法结构；它只负责尽量给 parser 提供后续 token，让一次编译能报告更多错误。
 
 ## 例题：最长匹配
 
@@ -762,6 +989,7 @@ baa
 
 ## 常见误区
 
+- 把“DFA 接受整个串”和“lexer 切下一个 token”混为一谈。前者读完整个测试串，后者只切当前位置的最长合法前缀。
 - `epsilon` 不是空集。空串是一个串，空集是不含任何串的集合。
 - NFA 的“非确定”不是随机，而是定义上允许多个选择。
 - NFA 接受是“存在一条成功路径”，不是“所有路径都成功”。
@@ -771,6 +999,28 @@ baa
 - DFA 最小化不能只看当前是否终态，还要看未来所有输入行为。
 - Lex 不是先匹配第一条规则，而是先最长匹配。
 - 关键字规则放在 ID 前面只解决“同长度”冲突，不能覆盖最长匹配。
+- 以为注释和空白“完全不存在”。它们通常不交给 parser，但 lexer 仍要读过它们，并维护行号、列号或空白信息。
+
+## 本章覆盖核对与外部参考
+
+本章已经覆盖本地 `ch2 词法分析.pdf` 中的主线内容：
+
+| PPT 主线 | 本章位置 |
+|---|---|
+| 词法分析概述、token/lexeme | “本章解决什么问题”“Token、Lexeme、Pattern” |
+| 形式语言、串、语言运算 | “形式语言基础” |
+| 正则表达式、正则定义、二义性规则 | “正则表达式”“Lex/Flex 规则” |
+| DFA/NFA、转换图/转换表 | “有穷自动机”“NFA”“DFA” |
+| Thompson 构造 | “RE 到 NFA：Thompson 构造直觉” |
+| 子集构造 | “NFA 到 DFA：子集构造” |
+| DFA 最小化 | “DFA 最小化” |
+| Lex 工具、最长匹配、规则优先 | “Lex/Flex 规则”“最长匹配如何实现” |
+
+本轮扩写还参考了几类公开资料来校准讲法：
+
+- [Flex 官方手册的匹配规则](https://westes.github.io/flex/manual/Matching.html)：最长匹配优先，同长度按规则顺序。
+- [Crafting Interpreters 的扫描器章节](https://craftinginterpreters.com/scanning.html)：强调 scanner 把字符分组成 token，并给 token 保存类型、字面量和位置信息。
+- [chibicc 的 tokenizer](https://github.com/rui314/chibicc/blob/main/tokenize.c)：作为真实 C 编译器的例子，展示手写 lexer 如何跳过注释/空白、读 identifier、读 punctuator、再识别关键字。
 
 ## 练习
 
