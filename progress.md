@@ -22,3 +22,7 @@
 - 为服务器部署新增阅读器 `--base-path` 支持，目标是在现有域名下以 `/compiler-notes/` 子路径代理到阅读器服务。
 - 服务器无法无凭据从 GitHub HTTPS clone 私有仓库；改用本机 `git archive` 打包当前提交，通过 scp 上传到 `/tmp` 并解压到 `/opt/compiler-review-notes`。
 - 服务器 `/opt/compiler-review-notes` 已运行 `python3 -m unittest tests/test_reader_server.py`，8 个测试通过。
+- 部署 systemd 服务 `compiler-review-notes.service`，运行命令为 `/usr/bin/python3 /opt/compiler-review-notes/reader_server.py --host 127.0.0.1 --port 8010 --base-path /compiler-notes`，服务已 enabled 且 active。
+- nginx 已加入 `/etc/nginx/snippets/compiler-review-notes-location.conf` 并在 `foreverhyx.conf` 的 HTTPS server 中 include，reload 成功。
+- 服务器侧验证通过：`https://foreverhyx.top/compiler-notes/` 返回笔记首页，`/compiler-notes/note/02_...md` 返回第 02 章，并包含 `data-answer-key="chapter-02"` 的答案展开控件。
+- 本机仍有早先测试启动的 `python3 reader_server.py` 在 `127.0.0.1:8000` 监听；沙箱普通 kill 失败，非沙箱 kill 审批服务 503，未继续绕路。
