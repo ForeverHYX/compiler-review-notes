@@ -131,3 +131,6 @@
 - 补强 `18_循环优化_教学计划补齐.md`：按 PPT/教材顺序重写本章，新增本章边界、loop vs cycle、reducible/irreducible、entry/exit/header、dominator 迭代、idom/dominator tree、back edge、natural loop 构造、nested loop、loop-nest tree、preheader、loop-invariant 识别、safe hoisting 三条件、loop variant 回忆卷题型、induction variables、strength reduction、bounds-check elimination、loop unrolling、弱化优化名词、判断题高频点和 PPT 覆盖核对。
 - 同步更新 `23_练习参考答案.md` 第 18 章答案，使新增的 cycle vs loop、preheader、safe hoisting 三条件、strength reduction、bounds check 和 unrolling 练习与题号对齐。
 - 修正 `00_复习路线与课程覆盖.md` 和 `findings.md` 中关于 ch18 没有课件/材料清单未列出的旧表述。
+- 本地验证通过：`python3 -m unittest tests/test_reader_server.py` 8 个测试通过，Markdown 表格结构检查通过，`git diff --check` 无输出。
+- 已提交并推送第 18 章补强：`6bed2b9 Deepen loop optimization notes for exam scope`。
+- 已部署 `6bed2b9` 到服务器；服务器端阅读器测试 8 个通过，`compiler-review-notes.service` 为 active，服务器本地抓取第 18 章页面包含“本章只学到哪里”“Cycle 不一定是 Loop”“Loop-Nest Tree”“Safe Hoisting 三条件”和 `data-answer-key="chapter-18"`。
