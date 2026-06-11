@@ -114,3 +114,5 @@
 - 补强 `16_垃圾回收.md`：新增本章边界、GC 技术总览、roots/reachability、freelist、mark-and-sweep 成本、pointer reversal、fragmentation、reference counting 赋值维护、copying collection 优缺点、forwarding pointer、Cheney 手算、compiler interface、fast allocation、pointer map/type descriptor、safe point、derived pointer、弱化内容和判断/选择题高频点。
 - 同步更新 `23_练习参考答案.md` 第 16 章答案，使 copying collection 优点和 pointer/non-pointer 信息贯穿编译阶段的练习与题号对齐。
 - 本地验证通过：`python3 -m unittest tests/test_reader_server.py` 8 个测试通过，Markdown 表格结构检查通过，`git diff --check` 无输出。
+- 已提交并推送第 16 章补强：`e4ba27c Deepen garbage collection notes for exam scope`。
+- 已部署 `e4ba27c` 到服务器；服务器端阅读器测试 8 个通过，`compiler-review-notes.service` 为 active，服务器本地抓取第 16 章页面包含“本章只学到哪里”“Cheney Algorithm”“Interface to the Compiler”“Pointer Map / Stack Map”和 `data-answer-key="chapter-16"`。
