@@ -72,3 +72,6 @@
 - 本地验证通过：`python3 -m unittest tests/test_reader_server.py` 8 个测试通过，Markdown 表格结构检查通过，`git diff --check` 无输出。
 - 已提交并推送第 09 章补强：`5acea59 Deepen activation record notes for exam scope`。
 - 已部署 `5acea59` 到服务器；服务器端阅读器测试 8 个通过，`compiler-review-notes.service` 为 active，SSH 检查服务器文件包含“本章只学到哪里”“Block Structure 的三种实现”“本章覆盖核对”。公网 `curl` 第 09 章页面时沙箱 DNS 失败，提权重试被审批服务 503 拒绝，本轮未做公网页面抓取验证。
+- 继续推进第 10 章 IR Tree 与中间代码生成：抽取 `materials/ch7 中间表示生成.pdf` 共 81 页，并抽取虎书 Translation to Intermediate Code 对应页，确认 PPT/教材主线包括 IR 分类、三地址码、IR Tree 节点、Ex/Nx/Cx、patch list、static link 变量访问、l-value/r-value、array/record 指针模型、conditionals、while/for、function call、declaration、function prologue/body/epilogue 和 fragments。
+- 补强 `10_IR_Tree_中间代码生成.md`：新增本章边界、IR 分类和三地址码对照、`NAME`/`LABEL` 区别、`ESEQ` 和 side effect、`Ex/Nx/Cx` 转换细节、patch list/backpatching、`F_Exp` 与 static link 访问、l-value/r-value、Tiger array/record pointer assignment、string equality/runtime call、for 循环 `maxint` 细节、record/array/string 翻译、declaration 翻译、function declaration 1-11 步和 PPT 覆盖核对。
+- 更新 `task_plan.md` 和 `findings.md`，记录第 10 章已按 PPT/考试范围补强，下一步转向第 11 章规范化、基本块与 Trace。
