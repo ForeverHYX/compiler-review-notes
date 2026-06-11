@@ -60,3 +60,6 @@
 - 本地验证通过：`python3 -m unittest tests/test_reader_server.py` 8 个测试通过，Markdown 表格结构检查通过，`git diff --check` 无输出。
 - 已提交并推送第 07 章补强：`c327bb8 Deepen AST notes for exam scope`。
 - 已部署 `c327bb8` 到服务器；服务器端阅读器测试 8 个通过，`compiler-review-notes.service` 为 active，公网第 07 章页面已验证包含“本章只学到哪里”“属性文法只掌握思想”“本章覆盖核对”等新增内容。
+- 继续推进第 08 章语义分析、符号表与类型检查：抽取 `materials/ch5 语义分析.pdf` 全部 93 页摘要，并抽取虎书 Semantic Analysis 对应页，确认 PPT/教材主线包括广义/狭义语义分析、符号表实现、Tiger TEnv/VEnv、name equivalence、nil、typing judgment、`transExp/transVar/transDec/transTy` 和递归声明 two-pass。
+- 补强 `08_语义分析_符号表_类型检查.md`：新增本章边界、binding 信息类别、多符号表与名字空间、三类命令式符号表实现、external chaining 判断题陷阱、functional persistent environment、string interning、type system 考试四问、Tiger name equivalence 精确解释、形式化记号阅读深度、`transVar` 三类变量访问、`transDec` 声明检查、作用域大题模板和 PPT 覆盖核对。
+- 更新 `task_plan.md` 和 `findings.md`，记录第 08 章已按 PPT/考试范围补强，下一步转向第 09 章活动记录、栈帧与变量逃逸。

@@ -61,3 +61,10 @@
 - 本地 `materials/ch4 抽象语法.pdf` 共 48 页，PPT 主线包括：lexer/parser recap、属性文法只需理解思想、语义动作与 semantic value、递归下降和 Yacc 中的语义动作、语义值栈、不要把整个编译器塞进 parser action、parse tree 的冗余与文法依赖、AST 作为 parser 和后续阶段的 clean interface、AST 应用、C tagged union/Java class/F# ADT 表示、tree-walking 操作、top-down/bottom-up 构造 AST、位置 position 字段、position stack 或 Yacc `pos` 非终结符技巧。
 - 虎书 Abstract Syntax 章节对应内容包括：semantic actions、Yacc semantic stack、parse tree/concrete syntax 与 abstract syntax、AST 让后续语义分析不受文法改写干扰、Tiger `absyn.h` 构造函数、`A_var/A_exp/A_dec/A_ty` 分类、`A_pos` 字段、连续 function/type declarations 合并为同一个 `FunctionDec/TypeDec`、`&`/`|`/unary minus 可翻译为已有 AST 节点、`S_symbol`、`escape` 字段。
 - `07_AST_抽象语法.md` 已按教材/PPT顺序补强本章边界、属性文法考试深度、parse tree 与 AST 的接口意义、为什么不在 parser action 里做完整编译、top-down/bottom-up 构造方式对比、Tiger 连续函数/类型声明合并、`&`/`|`/一元负号的 AST 表示、`S_symbol`/`escape`、position stack/Yacc `pos` 技巧、语义值栈规则和 PPT 覆盖核对。
+
+## 第 08 章补强依据
+
+- 本地 `materials/ch5 语义分析.pdf` 共 93 页，PPT 主线包括：CFG/parsing 的局限、广义/狭义 semantic analysis、binding/environment/symbol table、作用域和 shadowing、多个符号表、`insert/lookup/beginScope/endScope` 接口、imperative 与 functional 符号表、单一 hash table 加 scope marker、string 到 symbol 的实现技巧、type system 基本概念、Tiger 的 TEnv/VEnv、Tiger 类型、name equivalence、递归类型、nil、无隐式转换、typing judgment、递归 type checker、`transExp/transVar/transDec/transTy`、变量/类型/函数声明检查、递归类型/函数声明 two-pass。
+- 虎书 Semantic Analysis 章节对应内容包括：语义分析连接定义和使用、检查表达式类型并准备 IR；symbol table/environment；多个 active environments；外部链哈希表与 `S_beginScope/S_endScope`；functional-style symbol table；`S_symbol` interning；Tiger `Ty_ty`、`E_varEntry/E_funEntry`、`base_tenv/base_venv`；`actual_ty`；`transVar` 简单变量查 `VarEntry`；`LetExp` 同时打开 `venv/tenv`；变量声明中 `nil` initializer 需要 record 约束；函数声明参数作用域和返回类型检查；递归 type/function 声明先登记 header 再检查 body。
+- Princeton 公开的 Modern Compiler Implementation in C 项目页提供了虎书相关源文件入口，`types.h` 中的 `Ty_record/Ty_nil/Ty_int/Ty_string/Ty_array/Ty_name/Ty_void` 与本章 Tiger 类型表示一致：<https://www.cs.princeton.edu/~appel/modern/c/>
+- `08_语义分析_符号表_类型检查.md` 已按教材/PPT顺序补强本章边界、广义/狭义语义分析、多符号表与 TEnv/VEnv、三类符号表实现、external chaining 判断题陷阱、string interning、Tiger type system、形式化记号阅读深度、`actual_ty`、`transVar` 三类变量访问、`transDec` 声明检查、作用域大题模板和 PPT 覆盖核对。
