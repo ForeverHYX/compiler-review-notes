@@ -69,3 +69,6 @@
 - 继续推进第 09 章活动记录、栈帧与 Static Link：抽取 `materials/ch6 活动记录.pdf` 共 53 页、`materials/ch6 活动记录2（Block).pdf` 共 57 页，并抽取虎书 Activation Records 对应页，确认 PPT/教材主线包括运行时内存区域、activation record、FP/SP、caller-save/callee-save、frame-resident variables、escape、static link、display、lambda lifting、Tiger frame layout、`Frame`/`Translate` 两层抽象和 view shift。
 - 补强 `09_活动记录_栈帧_StaticLink.md`：新增本章边界、code/static/stack/heap 表、每次调用一份 frame、高阶函数限制、FP/SP 入口出口模型、寄存器传参与保存问题、frame-resident 七类原因、call-by-reference 判断题细节、block structure 三种实现、static link/dynamic link 对比、调用 static link 的嵌套深度公式、display/lambda lifting 速记、Tiger `Frame`/`Translate` 抽象和 PPT 覆盖核对。
 - 更新 `task_plan.md` 和 `findings.md`，记录第 09 章已按 PPT/考试范围补强，下一步转向第 10 章 IR Tree 中间代码生成。
+- 本地验证通过：`python3 -m unittest tests/test_reader_server.py` 8 个测试通过，Markdown 表格结构检查通过，`git diff --check` 无输出。
+- 已提交并推送第 09 章补强：`5acea59 Deepen activation record notes for exam scope`。
+- 已部署 `5acea59` 到服务器；服务器端阅读器测试 8 个通过，`compiler-review-notes.service` 为 active，SSH 检查服务器文件包含“本章只学到哪里”“Block Structure 的三种实现”“本章覆盖核对”。公网 `curl` 第 09 章页面时沙箱 DNS 失败，提权重试被审批服务 503 拒绝，本轮未做公网页面抓取验证。
