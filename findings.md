@@ -99,3 +99,10 @@
 - 本地 `materials/ch10 活跃变量分析.pdf` 共 88 页，PPT 主线包括：优化粒度 local/intraprocedural/interprocedural，dataflow analysis 的事实收集与转换，CFG 的 statement node 和 basic-block node 两种粒度，live variable 定义，不可判定与保守近似，forward/backward、must/may 分类，register allocation 动机，`pred/succ`、`use/def`、live-in/live-out，三条 liveness 规则，数据流方程，固定点迭代，逆控制流顺序加速，basic-block based CFG 的 `useB/defB` 扫描，set 表示，one-variable-at-a-time，复杂度、least fixed point，以及 static vs dynamic liveness。
 - 虎书 Liveness Analysis 章节对应内容包括：无限 temporaries 到有限寄存器的动机，Graph 10.1/10.2 的 live range 示例，Equations 10.3 和 Algorithm 10.4，正向/反向迭代顺序对收敛速度的影响，基本块级分析、集合表示、one-variable-at-a-time，保守近似与不可判定，interference matrix/graph，move instruction 特殊处理，Tiger 编译器中从 Assem flow graph 到 liveness/interference graph 的 `FG_def/FG_use/FG_isMove`、`Live_graph`、`liveMap` 和 zero-length live ranges。
 - `13_活跃变量分析.md` 已按教材/PPT顺序补强本章边界、dataflow analysis 总览、CFG 粒度、live variable 定义、static/dynamic 和保守近似、backward/may 分类、`pred/succ` 易错方向、`use/def`、abstract assembly 到 flow graph、三条 liveness 规则、`in/out` 方程、固定点迭代、反向顺序加速、block-level `useB/defB`、集合表示、顺序/分支/循环例题、interference graph、move 特殊处理、zero-length live range、Tiger 两阶段和 PPT 覆盖核对。
+
+## 第 14 章补强依据
+
+- 本地 `materials/ch11 寄存器分配1.pdf` 共 86 页，PPT 主线包括：register allocation 问题定义、K-coloring、干涉图、图着色复杂度、Kempe theorem、simplify/select、基础算法失败情形、optimistic coloring、potential spill 与 actual spill 的区别、spill rewrite、重新 liveness/regalloc，以及 K=4 simplify/select 示例。
+- 本地 `materials/ch11 寄存器分配2.pdf` 共 73 页，PPT 主线包括：move 指令特殊建边、coalescing、Briggs criterion、George criterion、optimized algorithm with move coalescing、freeze、constrained move、precolored nodes、precolored coalescing、caller-save/callee-save 建模、spill priority 公式和 K=3 综合例子。
+- 虎书 Register Allocation 章节对应内容包括：图着色寄存器分配、低度节点 simplify、select stack、spill cost、actual spill 后插入 load/store 并重建程序、move coalescing、Briggs/George conservative coalescing、precolored nodes、调用约定寄存器建模和迭代式分配流程。
+- `14_寄存器分配.md` 已按教材/PPT顺序补强本章边界、interference graph 建图、move 特殊规则、K-coloring、Kempe theorem、simplify/select、optimistic coloring、potential/actual spill、spill priority、Briggs/George、constrained move、iterated register coalescing、freeze、precolored nodes、caller-save/callee-save、大题模板和判断题高频点。
