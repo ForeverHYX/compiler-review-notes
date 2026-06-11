@@ -108,3 +108,5 @@
 - 补强 `15_完整编译器串联.md`：新增本章边界、总流水线、阶段输入输出、front/middle/back end、Token/AST、semantic environment、Frame/Level/Access、fragments、canonical tree、abstract assembly、liveness/regalloc 闭环、`procEntryExit`、code emission、runtime library、debug 定位表、贯穿例子和覆盖核对。
 - 同步更新 `23_练习参考答案.md` 第 15 章答案，使新增的 actual spill 闭环、call use/def 和 IR 降低 `N*M` 成本等练习与题号对齐。
 - 本地验证通过：`python3 -m unittest tests/test_reader_server.py` 8 个测试通过，Markdown 表格结构检查通过，`git diff --check` 无输出。
+- 已提交并推送第 15 章补强：`c3fd698 Deepen compiler pipeline notes for exam scope`。
+- 已部署 `c3fd698` 到服务器；服务器端阅读器测试 8 个通过，`compiler-review-notes.service` 为 active，服务器本地抓取第 15 章页面包含“本章只学到哪里”“总流水线”“Frame / Level / Access”“procEntryExit”和 `data-answer-key="chapter-15"`。
