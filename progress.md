@@ -52,3 +52,5 @@
 - 补强 `06_LR1_LALR_Yacc.md`：新增本章边界、SLR FOLLOW 近似局限、LR(1) 起始 lookahead/compact 表示、`FIRST(beta a)` 手算提示、LR(1) 填表规则、LALR 合并边和状态、LR 系列方法对比、Yacc 三段式、语义动作执行时机、默认冲突规则、`%prec/%nonassoc`、`error` token 恢复步骤、语法分析方法总览和 PPT 覆盖核对。
 - 更新 `task_plan.md` 和 `findings.md`，记录第 06 章已按 PPT/考试范围补强，下一步转向第 07 章 AST 抽象语法。
 - 本地验证通过：`python3 -m unittest tests/test_reader_server.py` 8 个测试通过，Markdown 表格结构检查通过，`git diff --check` 无输出。
+- 已提交并推送第 06 章补强：`3cf16a1 Deepen LR1 LALR Yacc notes for exam scope`。
+- 已部署 `3cf16a1` 到服务器；服务器端阅读器测试 8 个通过，`compiler-review-notes.service` 为 active，公网第 06 章页面已验证包含“本章只学到哪里”“SLR 为什么还不够精确”“语法分析方法总览”“本章覆盖核对”等新增内容。
