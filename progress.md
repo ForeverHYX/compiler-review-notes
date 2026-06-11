@@ -121,3 +121,6 @@
 - 继续推进第 17 章面向对象语言：抽取 `materials/ch14 面向对象语言.pdf` 共 52 页，确认 PPT 主线包括 Object-Tiger 语法、single inheritance prefix layout、dynamic dispatch/vtable、multiple inheritance graph coloring/hash、membership test、private fields/methods 和 OO optimization。
 - 补强 `17_面向对象语言.md`：按 PPT/教材顺序重写本章，新增本章边界、考试能力清单、Object-Tiger 语法、class hierarchy、对象/descriptor 布局、single inheritance 字段 prefix、static/dynamic dispatch、vtable slot、multiple inheritance graph coloring、direct object coloring 空槽、descriptor coloring、dynamic loading、hashing、membership linear search/class display、private 与继承、classless languages、devirtualization、判断题高频点和手算模板。
 - 同步更新 `23_练习参考答案.md` 第 17 章答案，使新增的 direct coloring empty slots、descriptor coloring、membership test、private fields/methods 等练习与题号对齐。
+- 本地验证通过：`python3 -m unittest tests/test_reader_server.py` 8 个测试通过，Markdown 表格结构检查通过，`git diff --check` 无输出。
+- 已提交并推送第 17 章补强：`0e9b070 Deepen object oriented language notes for exam scope`。
+- 已部署 `0e9b070` 到服务器；服务器端阅读器测试 8 个通过，`compiler-review-notes.service` 为 active，服务器本地抓取第 17 章页面包含“本章只学到哪里”“Dynamic Dispatch 与 VTable”“Direct Coloring on Objects 会有空槽”“Membership Test”和 `data-answer-key="chapter-17"`。
