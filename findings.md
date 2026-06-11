@@ -134,3 +134,9 @@
 - 虎书 Loop Optimizations 章节对应内容包括：精确定义 loop、irreducible flow graph、dominators 和不可达节点 caveat、natural loops、same-header loops 合并、nested loops、loop-nest tree、loop-invariant computations 的迭代识别、hoisting 安全条件、induction variables、strength reduction、bounds-check elimination、loop unrolling 和 epilogue。
 - LLVM 官方 Loop Terminology 文档用于外部校验术语：natural loop、header、latch/backedge、preheader、loop simplify form、irreducible control-flow 的工程术语与本章 PPT/教材主线一致：<https://llvm.org/docs/LoopTerminology.html>
 - `18_循环优化_教学计划补齐.md` 已按 PPT/教材顺序补强本章边界、loop vs cycle、reducible graph、dominator 手算、natural loop 构造、nested loop/loop-nest tree、preheader、loop-invariant 识别、safe hoisting 三条件、loop variant 回忆卷题型、induction variable、strength reduction、bounds-check elimination、loop unrolling、弱化优化名词和判断题高频点。
+
+## `19-24` 全局一致性审计
+
+- `21_速查表.md` 原循环优化速查仍停留在“无副作用、支配使用、循环不变”的粗略口径，已按第 18 章补入 safe hoisting 三条件、cycle vs loop、reducible/irreducible graph。
+- `24_回忆卷解析与考点加固.md` 原先把 “Maximum munch always produce optimal tiling” 判为 False；应按虎书/PPT 区分 optimal 与 optimum，改为 True，但注明不保证 lowest-cost/optimum tiling。
+- `24_回忆卷解析与考点加固.md` 原先把 “Global graph coloring directly in Multiple Inheritance leave empty slots in objects” 标为倾向 False；已按第 17 章修正为：若题干指 direct coloring on objects，则 True，descriptor coloring 才能把对象空槽转移到 descriptor。

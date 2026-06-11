@@ -134,3 +134,8 @@
 - 本地验证通过：`python3 -m unittest tests/test_reader_server.py` 8 个测试通过，Markdown 表格结构检查通过，`git diff --check` 无输出。
 - 已提交并推送第 18 章补强：`6bed2b9 Deepen loop optimization notes for exam scope`。
 - 已部署 `6bed2b9` 到服务器；服务器端阅读器测试 8 个通过，`compiler-review-notes.service` 为 active，服务器本地抓取第 18 章页面包含“本章只学到哪里”“Cycle 不一定是 Loop”“Loop-Nest Tree”“Safe Hoisting 三条件”和 `data-answer-key="chapter-18"`。
+- 补记第 18 章部署进度后，本地验证通过：阅读器单测 8 个通过，Markdown 表格结构检查通过，`git diff --check` 无输出；已提交并推送 `3dc6bfe Record loop optimization deployment progress`。
+- 已部署 `3dc6bfe` 到服务器；服务器端阅读器测试 8 个通过，`compiler-review-notes.service` 为 active，服务器本地抓取第 18 章页面包含新版标题和 `data-answer-key="chapter-18"`。
+- 开始 `19-24` 全局一致性审计：`19_教材后半拓展速读.md` 和 `20_综合练习题.md` 结构基本可用；发现 `21_速查表.md` 的循环优化条件落后于新版第 18 章，`24_回忆卷解析与考点加固.md` 中 Maximal Munch 和多继承 graph coloring 判断口径与已补强章节不一致。
+- 同步修正 `21_速查表.md`：补入 LICM safe hoisting 三条件、cycle vs loop、reducible/irreducible graph；同步修正 `24_回忆卷解析与考点加固.md`：Maximal Munch 的 optimal/optimum 区分和 direct graph-coloring object layout 空槽判断。
+- 更新 `20_综合练习题.md` 与 `23_练习参考答案.md` 的 Loop Optimization 综合题，加入 `t=a+b` 是否可安全外提的三条件说明；更新 `README.md` 第 18 章摘要。
