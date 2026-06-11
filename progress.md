@@ -91,3 +91,6 @@
 - 本地验证通过：`python3 -m unittest tests/test_reader_server.py` 8 个测试通过，Markdown 表格结构检查通过，`git diff --check` 无输出。
 - 已提交并推送第 12 章补强：`ff1cfd2 Deepen instruction selection notes for exam scope`。
 - 已部署 `ff1cfd2` 到服务器；服务器端阅读器测试 8 个通过，`compiler-review-notes.service` 为 active，服务器本地抓取第 12 章页面包含“Maximal Munch finds an optimal tiling”。
+- 继续推进第 13 章活跃变量分析：抽取 `materials/ch10 活跃变量分析.pdf` 共 88 页，并抽取虎书 Liveness Analysis 对应页，确认 PPT/教材主线包括 dataflow analysis 总览、CFG、live variable 定义、不可判定与保守近似、backward/may 分类、`use/def`、`in/out` 方程、固定点迭代、反向顺序加速、basic-block `useB/defB`、集合表示、least fixed point、static vs dynamic liveness、interference graph 和 move 特殊处理。
+- 补强 `13_活跃变量分析.md`：按 PPT/教材顺序重写本章，新增本章边界、dataflow analysis 总览、CFG 粒度、live variable 定义、static/dynamic 与保守近似、backward/may 分类、`pred/succ` 易错方向、`use/def`、abstract assembly 到 flow graph、三条 liveness 规则、`in/out` 方程、固定点迭代、反向顺序加速、block-level `useB/defB`、集合表示、顺序/分支/循环例题、interference graph、move 特殊处理、zero-length live range、Tiger 两阶段、大题模板、常见误区和 PPT 覆盖核对。
+- 本地验证通过：`python3 -m unittest tests/test_reader_server.py` 8 个测试通过，Markdown 表格结构检查通过，`git diff --check` 无输出。
