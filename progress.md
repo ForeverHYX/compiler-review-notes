@@ -100,3 +100,5 @@
 - 补强 `14_寄存器分配.md`：按 PPT/教材顺序重写本章，新增本章边界、interference graph 建图、move 特殊建边、K-coloring、Kempe theorem、simplify/select、potential spill/actual spill、spill rewrite、spill priority、Briggs/George、constrained move、iterated register coalescing、freeze、precolored nodes、caller-save/callee-save、大题手算模板和判断题高频点。
 - 同步更新 `23_练习参考答案.md` 第 14 章答案，使新增的 George criterion、spill priority、CALL def、freeze 等练习与题号对齐。
 - 本地验证通过：`python3 -m unittest tests/test_reader_server.py` 8 个测试通过，Markdown 表格结构检查通过，`git diff --check` 无输出。
+- 已提交并推送第 14 章补强：`bc66eef Deepen register allocation notes for exam scope`。
+- 已部署 `bc66eef` 到服务器；服务器端阅读器测试 8 个通过，`compiler-review-notes.service` 为 active，服务器本地抓取第 14 章页面包含“本章只学到哪里”“Briggs Criterion”“Freeze 的精确定义”“Caller-Save Registers”和 `data-answer-key="chapter-14"`。
