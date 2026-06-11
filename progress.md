@@ -26,3 +26,7 @@
 - nginx 已加入 `/etc/nginx/snippets/compiler-review-notes-location.conf` 并在 `foreverhyx.conf` 的 HTTPS server 中 include，reload 成功。
 - 服务器侧验证通过：`https://foreverhyx.top/compiler-notes/` 返回笔记首页，`/compiler-notes/note/02_...md` 返回第 02 章，并包含 `data-answer-key="chapter-02"` 的答案展开控件。
 - 本机仍有早先测试启动的 `python3 reader_server.py` 在 `127.0.0.1:8000` 监听；沙箱普通 kill 失败，非沙箱 kill 审批服务 503，未继续绕路。
+- 用户明确调整方向：不需要面面俱到的小教材式扩写，目标是面向考试复习，核心是覆盖 PPT 知识点、能处理历年卷判断/单选/大题。
+- 检查 `24_回忆卷解析与考点加固.md`，已发现用户新贴的判断题、选择题和大题大多已整理进去；后续用这些题校准各章节应讲到的深度和题型训练。
+- 用户进一步澄清：笔记顺序仍按教材/PPT 章节讲知识点，不改成题库或考点乱序；历年卷只用于控制每章深度和取舍。
+- 补强 `03_语法分析_CFG_推导_二义性.md`：新增本章边界、token 视角、straight-line program 文法、EOF marker、LL/LR 推导视角、句型/句子/语言、parse tree 与推导关系、parsing 搜索视角、优先级/结合性、dangling else、正则语言 vs CFG、PPT 覆盖核对。
