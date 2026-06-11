@@ -55,3 +55,9 @@
 - 本地 `materials/ch3 语法分析-4(LR(1), LALR(1), etc).pdf` 共 62 页，PPT 主线包括：SLR 的 FOLLOW 近似局限、LR(1) item 与 lookahead、`FIRST(beta z)` closure、LR(1) goto、LR(1) reduce action、LR(0)/SLR/LR(1) 归约条件对比、LR(1) 状态过多、LALR 合并相同 core、LALR 可能引入 reduce/reduce conflict、Yacc/Bison 作为 LALR parser generator、Lex/Yacc 协作、Yacc 三段式结构、语义动作在 reduce 时执行、优先级/结合性、默认冲突处理、LL/SLR/LR(1) 对比、parser generator 错误恢复、local/global error recovery。
 - 虎书 LR parsing/parser generator 小节对应内容包括：LR(1) item 是产生式+点位置+lookahead，起始项 `S' -> .S$` 的额外 lookahead 无关紧要，LR(1) reduce 只填 item 自带 lookahead，LALR 合并 lookahead 不同但 core 相同的状态，Yacc 三段式、shift/reduce 默认 shift、reduce/reduce 默认先出现规则、precedence declarations、`%prec UMINUS`、error token 恢复。
 - `06_LR1_LALR_Yacc.md` 已按教材/PPT顺序补强本章边界、SLR FOLLOW 近似局限、LR(1) 起始 lookahead/compact 表示、`FIRST(beta a)` 手算提示、LR(1) 填表规则清单、LALR 合并边和状态、LR 系列方法对比、Yacc 三段式、语义动作执行时机、默认冲突规则、`%left/%right/%nonassoc/%prec`、`error` token 恢复步骤、语法分析方法总览和 PPT 覆盖核对。
+
+## 第 07 章补强依据
+
+- 本地 `materials/ch4 抽象语法.pdf` 共 48 页，PPT 主线包括：lexer/parser recap、属性文法只需理解思想、语义动作与 semantic value、递归下降和 Yacc 中的语义动作、语义值栈、不要把整个编译器塞进 parser action、parse tree 的冗余与文法依赖、AST 作为 parser 和后续阶段的 clean interface、AST 应用、C tagged union/Java class/F# ADT 表示、tree-walking 操作、top-down/bottom-up 构造 AST、位置 position 字段、position stack 或 Yacc `pos` 非终结符技巧。
+- 虎书 Abstract Syntax 章节对应内容包括：semantic actions、Yacc semantic stack、parse tree/concrete syntax 与 abstract syntax、AST 让后续语义分析不受文法改写干扰、Tiger `absyn.h` 构造函数、`A_var/A_exp/A_dec/A_ty` 分类、`A_pos` 字段、连续 function/type declarations 合并为同一个 `FunctionDec/TypeDec`、`&`/`|`/unary minus 可翻译为已有 AST 节点、`S_symbol`、`escape` 字段。
+- `07_AST_抽象语法.md` 已按教材/PPT顺序补强本章边界、属性文法考试深度、parse tree 与 AST 的接口意义、为什么不在 parser action 里做完整编译、top-down/bottom-up 构造方式对比、Tiger 连续函数/类型声明合并、`&`/`|`/一元负号的 AST 表示、`S_symbol`/`escape`、position stack/Yacc `pos` 技巧、语义值栈规则和 PPT 覆盖核对。
