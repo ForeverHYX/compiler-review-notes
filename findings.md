@@ -36,3 +36,10 @@
 - Crafting Interpreters 的 “Representing Code” 章节用 `1 + 2 * 3 - 4` 和语法树说明“parser 把 token 流转换为更丰富的树结构”，也强调 syntactic grammar 的 alphabet 是 token 而不是 character：<https://craftinginterpreters.com/representing-code.html>
 - GNU Bison 手册的 shift/reduce conflict 页面说明 dangling else 的冲突本质：读到 `else` 时既可 reduce 又可 shift；Bison 默认 shift，因此 `else` 绑定到最近的未匹配 `if`：<https://www.gnu.org/software/bison/manual/html_node/Shift_002fReduce.html>
 - GNU Bison 手册 operator precedence 页面说明算术表达式也会产生 shift/reduce conflict，工具可用 precedence declarations 决定 shift/reduce：<https://www.gnu.org/software/bison/manual/html_node/Precedence.html>
+
+## 第 04 章补强依据
+
+- 本地 `materials/ch3 语法分析-2(TD).pdf` 前 80 页覆盖：递归下降概述、回溯问题、LL(k)/LL(1) 含义、Nullable/FIRST/FOLLOW 归纳定义与迭代计算、LL(1) 文法定义、预测分析表构造、表项冲突、非递归 table-driven parsing。
+- 本地 `materials/ch3 语法分析-2(TD).pdf` 后半部分继续覆盖：表驱动 LL(1) 示例、递归下降代码实现、FIRST/FOLLOW 何时用于选择分支、LL(1) 文法无二义性/无左递归/无左公因子、提左公因子、消除直接左递归、错误恢复目标、空表项报错、insert token 与 delete/skip token 到 FOLLOW 集的取舍。
+- 虎书 predictive parsing 小节覆盖：递归下降函数、nullable/FIRST/FOLLOW、Algorithm 3.13、predictive parsing table、LL(1) 含义、左递归消除、提左公因子、error recovery。
+- `04_LL1_自顶向下分析.md` 已按教材/PPT顺序补强本章边界、递归下降回溯动机、FIRST 右部串含义、FOLLOW 不含 epsilon、空表项/冲突表项、栈模拟压栈顺序、LL(1) 快速排除性质、错误恢复策略对比和 PPT 覆盖核对。
