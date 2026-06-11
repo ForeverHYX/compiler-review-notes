@@ -143,3 +143,6 @@
 - 已提交并推送全局一致性修正：`0b75110 Align exam review cross references`。
 - 已部署 `0b75110` 到服务器；服务器端阅读器测试 8 个通过，`compiler-review-notes.service` 为 active，服务器本地抓取 `20/21/24` 页面包含 “能否安全外提”“Safe hoisting 三条件”“cycle vs loop”“不保证 optimum tiling”“direct coloring on objects”。
 - 本次页面验证第一次命令因 grep 文本含反引号，触发本机 zsh 命令替换并报 `command not found: t`；已改用不含反引号的匹配文本重新验证通过。
+- 补记全局一致性部署进度后，本地验证通过：阅读器单测 8 个通过，Markdown 表格结构检查通过，`git diff --check` 无输出；已提交并推送 `3d430b8 Record cross reference deployment progress`。
+- 已部署 `3d430b8` 到服务器；服务器端阅读器测试 8 个通过，`compiler-review-notes.service` 为 active，服务器本地抓取 `21/24` 页面确认 “Safe hoisting 三条件”“cycle vs loop”“不保证 optimum tiling”“direct coloring on objects” 仍在线上可见。
+- 更新 `task_plan.md`：本轮考试复习向内容补强、覆盖审计、阅读器、GitHub/部署和最终验证标记为完成；剩余事项改为可选的插图与阅读体验增强。
