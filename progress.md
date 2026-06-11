@@ -89,3 +89,5 @@
 - 继续推进第 12 章指令选择与 Tiling：抽取 `materials/ch9 指令选择.pdf` 共 82 页，并抽取虎书 Instruction Selection 对应页，确认 PPT/教材主线包括 tree pattern/tile/tiling、Jouette 示例、`TEMP` 零成本、optimal vs optimum、Maximal Munch、Dynamic Programming、tree grammar、RISC/CISC 差异和抽象汇编 `OPER/LABEL/MOVE`。
 - 补强 `12_指令选择_Tiling.md`：按 PPT/教材顺序重写本章，新增本章边界、后端三任务、不是每个 IR node 对一条指令的判断题陷阱、tree pattern/tile/tiling、Jouette 与 `TEMP` 零成本、`a[i] := x` tiling 主线、small tiles、optimal vs optimum、Maximal Munch 性质、DP 成本和 tile leaves、tree grammar、RISC/CISC、CISC 特殊问题、abstract assembly、`dst/src/jumps`、CALL clobber、大题模板、常见误区和 PPT 覆盖核对。
 - 本地验证通过：`python3 -m unittest tests/test_reader_server.py` 8 个测试通过，Markdown 表格结构检查通过，`git diff --check` 无输出。
+- 已提交并推送第 12 章补强：`ff1cfd2 Deepen instruction selection notes for exam scope`。
+- 已部署 `ff1cfd2` 到服务器；服务器端阅读器测试 8 个通过，`compiler-review-notes.service` 为 active，服务器本地抓取第 12 章页面包含“Maximal Munch finds an optimal tiling”。
