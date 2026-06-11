@@ -58,3 +58,5 @@
 - 补强 `07_AST_抽象语法.md`：新增本章边界、属性文法考试深度、parse tree 与 AST 的接口意义、为什么不在 parser action 里做完整编译、top-down/bottom-up 构造方式对比、Tiger 连续函数/类型声明合并、`&`/`|`/一元负号的 AST 表示、`S_symbol`/`escape`、position stack/Yacc `pos` 技巧、语义值栈规则和 PPT 覆盖核对。
 - 更新 `task_plan.md` 和 `findings.md`，记录第 07 章已按 PPT/考试范围补强，下一步转向第 08 章语义分析、符号表与类型检查。
 - 本地验证通过：`python3 -m unittest tests/test_reader_server.py` 8 个测试通过，Markdown 表格结构检查通过，`git diff --check` 无输出。
+- 已提交并推送第 07 章补强：`c327bb8 Deepen AST notes for exam scope`。
+- 已部署 `c327bb8` 到服务器；服务器端阅读器测试 8 个通过，`compiler-review-notes.service` 为 active，公网第 07 章页面已验证包含“本章只学到哪里”“属性文法只掌握思想”“本章覆盖核对”等新增内容。
