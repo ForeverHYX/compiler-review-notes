@@ -78,3 +78,9 @@
 - 本地验证通过：`python3 -m unittest tests/test_reader_server.py` 8 个测试通过，Markdown 表格结构检查通过，`git diff --check` 无输出。
 - 已提交并推送第 10 章补强：`287125d Deepen IR tree notes for exam scope`。
 - 已部署 `287125d` 到服务器；服务器端阅读器测试 8 个通过，`compiler-review-notes.service` 为 active，SSH 检查服务器文件包含第 10 章新增标题。公网 `curl` 仍受沙箱 DNS/审批服务限制，本轮以服务器侧验证为准。
+- 用户再次澄清：顺序仍按教材/PPT 知识点讲，不按题型重排；知识点分布可以适度合并，但只专注考试和 PPT 范围，不做课外扩展。
+- 补记第 10 章部署进度后，本地验证通过：阅读器单测 8 个通过，Markdown 表格结构检查通过，`git diff --check` 无输出；已提交并推送 `bcb05e2 Record IR tree deployment progress`。
+- 已部署 `bcb05e2` 到服务器；服务器端阅读器测试 8 个通过，服务状态 `active`，服务器本地抓取第 10 章页面包含“本章只学到哪里”。一次远程 `grep` 因本机 shell 误解释反引号而产生无害报错，已改用纯提交号匹配。
+- 继续推进第 11 章规范化、基本块与 Trace：抽取 `materials/ch8  (处理IR) 基本块和traces.pdf` 共 77 页，并抽取虎书 Basic Blocks and Traces 对应页，确认 PPT/教材主线包括 canonical tree、ESEQ/CALL 改写、commute、linearize、basic block 构造、trace covering、`CJUMP` false fall-through 和冗余 jump 删除。
+- 补强 `11_规范化_基本块_Trace.md`：按 PPT/教材顺序重写本章，新增本章边界、三阶段总览、canonical form 精确定义、ESEQ 改写规则、第二操作数与 commute、`reorder/do_exp/do_stm`、`MOVE` 左侧 destination 特例、CALL 顶层化、linearize、basic block 构造和 `done` label、CFG 后继、trace covering、`CJUMP` 三种 finishing up、冗余 jump 删除、大题手算模板、常见误区和 PPT 覆盖核对。
+- 本地验证通过：`python3 -m unittest tests/test_reader_server.py` 8 个测试通过，Markdown 表格结构检查通过，`git diff --check` 无输出。
