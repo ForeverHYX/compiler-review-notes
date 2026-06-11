@@ -68,3 +68,10 @@
 - 虎书 Semantic Analysis 章节对应内容包括：语义分析连接定义和使用、检查表达式类型并准备 IR；symbol table/environment；多个 active environments；外部链哈希表与 `S_beginScope/S_endScope`；functional-style symbol table；`S_symbol` interning；Tiger `Ty_ty`、`E_varEntry/E_funEntry`、`base_tenv/base_venv`；`actual_ty`；`transVar` 简单变量查 `VarEntry`；`LetExp` 同时打开 `venv/tenv`；变量声明中 `nil` initializer 需要 record 约束；函数声明参数作用域和返回类型检查；递归 type/function 声明先登记 header 再检查 body。
 - Princeton 公开的 Modern Compiler Implementation in C 项目页提供了虎书相关源文件入口，`types.h` 中的 `Ty_record/Ty_nil/Ty_int/Ty_string/Ty_array/Ty_name/Ty_void` 与本章 Tiger 类型表示一致：<https://www.cs.princeton.edu/~appel/modern/c/>
 - `08_语义分析_符号表_类型检查.md` 已按教材/PPT顺序补强本章边界、广义/狭义语义分析、多符号表与 TEnv/VEnv、三类符号表实现、external chaining 判断题陷阱、string interning、Tiger type system、形式化记号阅读深度、`actual_ty`、`transVar` 三类变量访问、`transDec` 声明检查、作用域大题模板和 PPT 覆盖核对。
+
+## 第 09 章补强依据
+
+- 本地 `materials/ch6 活动记录.pdf` 共 53 页，PPT 主线包括：run-time environment 中 code/data 的划分、现代处理器寄存器/内存直觉、运行时内存布局、activation record/stack frame、递归调用中每次调用有独立参数和局部变量、globals/static data、heap 中动态对象、FP/SP、寄存器减少栈帧内存流量、Tiger call-by-value、参数寄存器、caller-save/callee-save、return address、return value、locals/temporaries、frame-resident variables 的七个原因、escape variables 和总结。
+- 本地 `materials/ch6 活动记录2（Block).pdf` 共 57 页，PPT 主线包括：nested functions 的 block structure 问题、static link、display、lambda lifting 三种实现策略、static link 访问非局部变量、static link 与 dynamic link 对比、display 的维护、三种方案对比、Tiger 典型栈帧布局、static link 可能跳过 dynamic frames、stack frame 对 higher-order functions 的限制，以及 prettyprint 示例中的 static link 设置公式。
+- 虎书 Activation Records 章节对应内容包括：局部变量 LIFO 生命周期、higher-order functions 需要 closure 而不能只靠 stack frame、stack pointer/frame pointer、stack frame 图、caller-save/callee-save 是 calling convention、参数寄存器带来的保存问题、frame-resident 条件、escape 定义、FindEscape 必须早于 Semant、`F_frame/F_access/F_newFrame/F_allocLocal`、`InFrame/InReg`、view shift、`Tr_level/Tr_access` 两层抽象、static link 由 Translate 处理并作为隐藏 formal 加入 frame。
+- x86-64 psABI GitLab 项目提供 System V AMD64 ABI 的官方维护入口；其公开说明与本章调用约定补充相关：<https://gitlab.com/x86-psABIs/x86-64-ABI/-/raw/master/README.md>。实际考试仍以 PPT 中的抽象 calling convention 和虎书 Frame 模块为准。
