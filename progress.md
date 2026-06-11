@@ -48,3 +48,7 @@
 - 本地验证通过：`python3 -m unittest tests/test_reader_server.py` 8 个测试通过，Markdown 表格结构检查通过，`git diff --check` 无输出。
 - 已提交并推送第 05 章补强：`a9b43e2 Deepen LR0 SLR notes for exam scope`。
 - 已部署 `a9b43e2` 到服务器；服务器端阅读器测试 8 个通过，`compiler-review-notes.service` 为 active，公网第 05 章页面已验证包含“本章只学到哪里”“Handle 与 Viable Prefix”“本章覆盖核对”等新增内容。
+- 继续推进第 06 章 LR(1)/LALR/Yacc：抽取 `materials/ch3 语法分析-4(LR(1), LALR(1), etc).pdf` 全部 62 页摘要，并抽取虎书 parser generator 对应页，确认 PPT/教材主线包括 LR(1) closure/goto/reduce、LALR 合并、Yacc 三段式、冲突规则、优先级、`error` token 和错误恢复。
+- 补强 `06_LR1_LALR_Yacc.md`：新增本章边界、SLR FOLLOW 近似局限、LR(1) 起始 lookahead/compact 表示、`FIRST(beta a)` 手算提示、LR(1) 填表规则、LALR 合并边和状态、LR 系列方法对比、Yacc 三段式、语义动作执行时机、默认冲突规则、`%prec/%nonassoc`、`error` token 恢复步骤、语法分析方法总览和 PPT 覆盖核对。
+- 更新 `task_plan.md` 和 `findings.md`，记录第 06 章已按 PPT/考试范围补强，下一步转向第 07 章 AST 抽象语法。
+- 本地验证通过：`python3 -m unittest tests/test_reader_server.py` 8 个测试通过，Markdown 表格结构检查通过，`git diff --check` 无输出。

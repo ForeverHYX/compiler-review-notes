@@ -49,3 +49,9 @@
 - 本地 `materials/ch3 语法分析-3(BU)-LR(0)SLR(1).pdf` 共 98 页，PPT 主线包括：LL(1) 局限与 LR(k) 表达力、shift-reduce 分界点模型、最右推导的逆过程、LR 表驱动程序、LR(0) item 表示 RHS 识别进度、LR(0) NFA 直觉、NFA 到 DFA/项集族、closure/goto、从 DFA 填 ACTION/GOTO、状态栈算法、完整 LR(0) 分析示例、LR(0) 中 `0` 的含义、LR(0) 冲突、SLR 用 FOLLOW 集限制 reduce、SLR 仍可能冲突。
 - 虎书 LR parsing 小节对应内容包括：状态栈表驱动算法、LR(0) parser generation、closure/goto、增广文法 `S' -> S$`、`$` 不计算 goto 而产生 accept、LR(0) 完整项在所有 token 上 reduce、SLR 只在 FOLLOW 集上填 reduce。
 - `05_LR0_SLR_自底向上分析.md` 已按教材/PPT顺序补强本章边界、shift-reduce 分界点与最右推导逆过程、handle/viable prefix、LR(0) item 中 `0` 的含义、LR(0) NFA 到 DFA 直觉、`$`/accept 边界、ACTION/GOTO 填表检查清单、epsilon 规约栈规则、SLR 手算流程、SLR 局限和 PPT 覆盖核对。
+
+## 第 06 章补强依据
+
+- 本地 `materials/ch3 语法分析-4(LR(1), LALR(1), etc).pdf` 共 62 页，PPT 主线包括：SLR 的 FOLLOW 近似局限、LR(1) item 与 lookahead、`FIRST(beta z)` closure、LR(1) goto、LR(1) reduce action、LR(0)/SLR/LR(1) 归约条件对比、LR(1) 状态过多、LALR 合并相同 core、LALR 可能引入 reduce/reduce conflict、Yacc/Bison 作为 LALR parser generator、Lex/Yacc 协作、Yacc 三段式结构、语义动作在 reduce 时执行、优先级/结合性、默认冲突处理、LL/SLR/LR(1) 对比、parser generator 错误恢复、local/global error recovery。
+- 虎书 LR parsing/parser generator 小节对应内容包括：LR(1) item 是产生式+点位置+lookahead，起始项 `S' -> .S$` 的额外 lookahead 无关紧要，LR(1) reduce 只填 item 自带 lookahead，LALR 合并 lookahead 不同但 core 相同的状态，Yacc 三段式、shift/reduce 默认 shift、reduce/reduce 默认先出现规则、precedence declarations、`%prec UMINUS`、error token 恢复。
+- `06_LR1_LALR_Yacc.md` 已按教材/PPT顺序补强本章边界、SLR FOLLOW 近似局限、LR(1) 起始 lookahead/compact 表示、`FIRST(beta a)` 手算提示、LR(1) 填表规则清单、LALR 合并边和状态、LR 系列方法对比、Yacc 三段式、语义动作执行时机、默认冲突规则、`%left/%right/%nonassoc/%prec`、`error` token 恢复步骤、语法分析方法总览和 PPT 覆盖核对。
