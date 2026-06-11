@@ -34,3 +34,6 @@
 - 抽取 `materials/ch3 语法分析-2(TD).pdf` 第 81-115 页，确认后半部分覆盖表驱动示例、递归下降实现、文法改造和错误恢复；第一次 PDF 抽取命令因 `python3 -c` 换行转义失败，已改用脚本式命令成功抽取，并记录该错误。
 - 补强 `04_LL1_自顶向下分析.md`：新增本章边界、回溯示例、递归下降何时需要 FIRST/FOLLOW、FIRST 右部串说明、FOLLOW 不含 epsilon、空表项/冲突表项、LL(1) 快速排除性质、表驱动压栈顺序、提左公因子目的、错误恢复策略对比和 PPT 覆盖核对。
 - 更新 `task_plan.md` 和 `findings.md`，记录第 04 章补强依据和当前继续按章节顺序推进的约束。
+- 本地验证通过：`python3 -m unittest tests/test_reader_server.py` 8 个测试通过，Markdown 表格结构检查通过，`git diff --check` 无输出。
+- 已提交并推送第 04 章补强：`d206198 Deepen LL1 notes for exam scope`。
+- 已部署 `d206198` 到服务器；服务器端阅读器测试 8 个通过，`compiler-review-notes.service` 为 active，公网第 04 章页面已验证包含“本章只学到哪里”“本章覆盖核对”等新增内容。
