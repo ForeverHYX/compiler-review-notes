@@ -110,3 +110,7 @@
 - 本地验证通过：`python3 -m unittest tests/test_reader_server.py` 8 个测试通过，Markdown 表格结构检查通过，`git diff --check` 无输出。
 - 已提交并推送第 15 章补强：`c3fd698 Deepen compiler pipeline notes for exam scope`。
 - 已部署 `c3fd698` 到服务器；服务器端阅读器测试 8 个通过，`compiler-review-notes.service` 为 active，服务器本地抓取第 15 章页面包含“本章只学到哪里”“总流水线”“Frame / Level / Access”“procEntryExit”和 `data-answer-key="chapter-15"`。
+- 继续推进第 16 章垃圾回收：抽取 `materials/ch13 垃圾回收-1.pdf` 共 87 页、`materials/ch13 垃圾回收-2.pdf` 共 105 页，确认 PPT 主线包括 mark-and-sweep、reference counting、copying collection、Cheney、pointer forwarding、compiler interface、pointer map 和 pointer 信息跨阶段传递。
+- 补强 `16_垃圾回收.md`：新增本章边界、GC 技术总览、roots/reachability、freelist、mark-and-sweep 成本、pointer reversal、fragmentation、reference counting 赋值维护、copying collection 优缺点、forwarding pointer、Cheney 手算、compiler interface、fast allocation、pointer map/type descriptor、safe point、derived pointer、弱化内容和判断/选择题高频点。
+- 同步更新 `23_练习参考答案.md` 第 16 章答案，使 copying collection 优点和 pointer/non-pointer 信息贯穿编译阶段的练习与题号对齐。
+- 本地验证通过：`python3 -m unittest tests/test_reader_server.py` 8 个测试通过，Markdown 表格结构检查通过，`git diff --check` 无输出。

@@ -112,3 +112,10 @@
 - 本地 `materials/ch1 简介.pdf` 共 56 页，PPT 主线中“编译器的阶段”和“TIGER 编译器流程”覆盖：编译器定义、广义/狭义目标语言、预处理器/编译器/汇编器/链接器、JIT/AOT、前端/中端/后端、词法/语法/语义/IR/优化/目标代码生成，以及 Tiger 的 AST、IRTree、Canonicalized IRTree、Assem、CFG、InterferenceGraph 串联。
 - 虎书 Introduction 的 Figure 1.1 和 Table 1.2 覆盖完整 compiler phases and interfaces：Source Program、Tokens、Abstract Syntax、Frame、IR Trees、Assem、Flow Graph、Interference Graph、Register Assignment、Code Emission，并强调每个阶段通过数据结构或抽象接口模块化连接。
 - `15_完整编译器串联.md` 已按教材/PPT顺序补强本章边界、总流水线、每阶段输入输出、front/middle/back end、Token-AST、semantic environment、Frame/Level/Access、fragments、canonical tree、abstract assembly、liveness/regalloc 闭环、`procEntryExit`、code emission、runtime library、debug 定位表和小程序串联答题模板。
+
+## 第 16 章补强依据
+
+- 本地 `materials/ch13 垃圾回收-1.pdf` 共 87 页，PPT 主线包括：GC 技术总览、directed graph/root/reachability、freelist、mark-and-sweep、mark DFS、mark-sweep 成本、explicit stack、pointer reversal、memory fragmentation、reference counting、引用计数赋值维护、reference cycle、reference counting 优缺点。
+- 本地 `materials/ch13 垃圾回收-2.pdf` 共 105 页，PPT 主线包括：copying collection、from-space/to-space、fast allocation、Cheney algorithm、pointer forwarding、BFS queue 的 scan/next、不复制死对象、locality、copying collection 优缺点、compiler interface、fast allocation 优化、pointer map/stack map、type descriptor、derived pointers，以及 pointer/non-pointer 信息贯穿 type checking、temp、spill slot、register allocation 和 code emission。
+- 虎书 Garbage Collection 章节对应内容包括：garbage 的 reachability 近似、mark-and-sweep 算法、reference counts 和循环垃圾、copying collection/forwarding/Cheney、generational/incremental 概念、interface to the compiler；本课件明确 generational/incremental 书上有但不考算法细节。
+- `16_垃圾回收.md` 已按 PPT/教材顺序补强本章边界、roots/reachability、freelist、mark-and-sweep、成本公式、explicit stack/pointer reversal、fragmentation、reference counting、copying collection、forwarding pointer、Cheney 手算、compiler interface、pointer map/type descriptor、safe point、derived pointer、弱化内容速记和判断/选择题高频点。
