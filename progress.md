@@ -160,3 +160,6 @@
 - 一次 `rg` 命令因双引号中的反引号被 zsh 解释为命令替换，误输出大量内容；后续改用固定字符串/脚本扫描。
 - 一次 Markdown 表格源检查误报第 09 章 ASCII 内存图中的 `|                  |`；确认该行在 fenced code block 内，已改用忽略代码块的检查脚本并通过。
 - 提交前完整验证通过：`python3 -m unittest tests/test_reader_server.py` 11 个测试通过；忽略代码块的 Markdown 表格检查通过；所有笔记渲染后表格列数一致；关键行内代码样例检查通过；`git diff --check` 无输出。
+- 已提交并推送显示修复：`2ca5831 Fix reader table rendering issues`。
+- 已部署 `2ca5831` 到服务器；服务器端阅读器测试 11 个通过，`compiler-review-notes.service` 为 active。
+- 服务器本机 HTTP 验证通过：首页和 02、03、08、12、24 章关键样例均返回修复后的行内代码；公网 HTTPS 验证通过：`https://foreverhyx.top/compiler-notes/` 可访问，24 章回忆卷正则表达式样例不再被表格拆列。
