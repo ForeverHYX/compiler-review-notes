@@ -379,16 +379,47 @@ def render_table(table_lines: list[str], base_path: str = "") -> str:
 
 
 def split_table_row(line: str) -> list[str]:
-    stripped = line.strip()
-    if stripped.startswith("|"):
-        stripped = stripped[1:]
-    if stripped.endswith("|"):
-        stripped = stripped[:-1]
-    return [cell.strip() for cell in stripped.split("|")]
+    text = line.strip()
+    cells: list[str] = []
+    current: list[str] = []
+    code_tick_run = 0
+    index = 0
+
+    while index < len(text):
+        char = text[index]
+
+        if char == "\\" and code_tick_run == 0 and index + 1 < len(text) and text[index + 1] == "|":
+            current.append("|")
+            index += 2
+            continue
+
+        if char == "`":
+            run_length = count_backtick_run(text, index)
+            current.append("`" * run_length)
+            if code_tick_run == 0:
+                code_tick_run = run_length
+            elif code_tick_run == run_length:
+                code_tick_run = 0
+            index += run_length
+            continue
+
+        if char == "|" and code_tick_run == 0:
+            cells.append("".join(current).strip())
+            current = []
+        else:
+            current.append(char)
+        index += 1
+
+    cells.append("".join(current).strip())
+    if cells and cells[0] == "":
+        cells = cells[1:]
+    if cells and cells[-1] == "":
+        cells = cells[:-1]
+    return cells
 
 
 def render_inline(text: str, base_path: str = "") -> str:
-    escaped = html.escape(text)
+    escaped, code_spans = extract_code_spans(text)
 
     def link_repl(match: re.Match[str]) -> str:
         label = match.group(1)
@@ -401,9 +432,47 @@ def render_inline(text: str, base_path: str = "") -> str:
         return f'<a href="{html.escape(href)}">{label}</a>'
 
     escaped = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", link_repl, escaped)
-    escaped = re.sub(r"`([^`]+)`", r"<code>\1</code>", escaped)
     escaped = re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", escaped)
+    for placeholder, code_html in code_spans:
+        escaped = escaped.replace(placeholder, code_html)
     return escaped
+
+
+def count_backtick_run(text: str, start: int) -> int:
+    index = start
+    while index < len(text) and text[index] == "`":
+        index += 1
+    return index - start
+
+
+def extract_code_spans(text: str) -> tuple[str, list[tuple[str, str]]]:
+    pieces: list[str] = []
+    buffer: list[str] = []
+    code_spans: list[tuple[str, str]] = []
+    index = 0
+
+    def flush_buffer() -> None:
+        if buffer:
+            pieces.append(html.escape("".join(buffer)))
+            buffer.clear()
+
+    while index < len(text):
+        if text[index] == "`":
+            run_length = count_backtick_run(text, index)
+            close = text.find("`" * run_length, index + run_length)
+            if close != -1:
+                flush_buffer()
+                content = text[index + run_length : close]
+                placeholder = f"\x00CODE{len(code_spans)}\x00"
+                code_spans.append((placeholder, f"<code>{html.escape(content)}</code>"))
+                pieces.append(placeholder)
+                index = close + run_length
+                continue
+        buffer.append(text[index])
+        index += 1
+
+    flush_buffer()
+    return "".join(pieces), code_spans
 
 
 def slugify(text: str) -> str:

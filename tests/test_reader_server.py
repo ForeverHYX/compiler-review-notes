@@ -1,4 +1,5 @@
 import unittest
+import re
 from pathlib import Path
 
 import reader_server
@@ -82,6 +83,38 @@ class ReaderServerTests(unittest.TestCase):
         )
 
         self.assertIn('href="/compiler-notes/note/23_', html)
+
+    def test_table_cells_preserve_pipes_inside_inline_code(self):
+        html = reader_server.markdown_to_html(
+            "| 正则 | 含义 |\n"
+            "|---|---|\n"
+            "| `r | s` | 并集 |\n"
+            "| a\\|b | escaped pipe |"
+        )
+
+        self.assertIn("<td><code>r | s</code></td><td>并集</td>", html)
+        self.assertIn("<td>a|b</td><td>escaped pipe</td>", html)
+        self.assertNotIn("<td>`r</td>", html)
+
+    def test_double_backtick_inline_code_renders_as_one_code_span(self):
+        html = reader_server.markdown_to_html("占位符 `` `d0`` 表示第 0 个 destination temp。")
+
+        self.assertIn("<code> `d0</code>", html)
+        self.assertNotIn("<code> </code>d0", html)
+
+    def test_rendered_note_tables_have_consistent_column_counts(self):
+        answer_index = reader_server.load_answer_index(ROOT)
+
+        for note in reader_server.discover_notes(ROOT):
+            with self.subTest(note=note.filename):
+                html = reader_server.render_note_page(ROOT, note, answer_index)
+                for table in re.findall(r"<table>.*?</table>", html, flags=re.S):
+                    header_count = table.count("<th>")
+                    self.assertGreater(header_count, 0)
+                    for row in re.findall(r"<tr>(.*?)</tr>", table, flags=re.S):
+                        body_count = row.count("<td>")
+                        if body_count:
+                            self.assertEqual(body_count, header_count, row[:240])
 
 
 if __name__ == "__main__":

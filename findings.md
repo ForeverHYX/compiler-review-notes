@@ -140,3 +140,10 @@
 - `21_速查表.md` 原循环优化速查仍停留在“无副作用、支配使用、循环不变”的粗略口径，已按第 18 章补入 safe hoisting 三条件、cycle vs loop、reducible/irreducible graph。
 - `24_回忆卷解析与考点加固.md` 原先把 “Maximum munch always produce optimal tiling” 判为 False；应按虎书/PPT 区分 optimal 与 optimum，改为 True，但注明不保证 lowest-cost/optimum tiling。
 - `24_回忆卷解析与考点加固.md` 原先把 “Global graph coloring directly in Multiple Inheritance leave empty slots in objects” 标为倾向 False；已按第 17 章修正为：若题干指 direct coloring on objects，则 True，descriptor coloring 才能把对象空槽转移到 descriptor。
+
+## 全站显示异常修复
+
+- 当前阅读器的 `split_table_row()` 只做 `stripped.split("|")`，会把 Markdown 表格单元格中反引号代码片段里的 `|` 误判成列分隔符。
+- 全量渲染审计已复现列数异常：`02_词法分析_RE_NFA_DFA_Lex.md` 5 行、`03_语法分析_CFG_推导_二义性.md` 6 行、`08_语义分析_符号表_类型检查.md` 2 行、`24_回忆卷解析与考点加固.md` 1 行。
+- 典型受影响内容包括正则表达式 `r | s`、CFG 产生式 `S -> A S | epsilon`、typing judgment `Gamma |- exp : ty`、回忆卷中的 `(a|c)*|(a|c)*b(a|c)*`。
+- 这是渲染器通用缺陷，不应通过逐条 Markdown 改写来规避；需要让表格切分只识别代码片段外的未转义 `|`。

@@ -146,3 +146,17 @@
 - 补记全局一致性部署进度后，本地验证通过：阅读器单测 8 个通过，Markdown 表格结构检查通过，`git diff --check` 无输出；已提交并推送 `3d430b8 Record cross reference deployment progress`。
 - 已部署 `3d430b8` 到服务器；服务器端阅读器测试 8 个通过，`compiler-review-notes.service` 为 active，服务器本地抓取 `21/24` 页面确认 “Safe hoisting 三条件”“cycle vs loop”“不保证 optimum tiling”“direct coloring on objects” 仍在线上可见。
 - 更新 `task_plan.md`：本轮考试复习向内容补强、覆盖审计、阅读器、GitHub/部署和最终验证标记为完成；剩余事项改为可选的插图与阅读体验增强。
+
+## 2026-06-13
+
+- 用户要求继续把所有笔记修完；恢复计划后确认考试复习向内容补强主线已完成，当前转入全站显示异常修复。
+- 重新读取 `reader_server.py`、`tests/test_reader_server.py` 和第 02 章相邻段落，确认“形式语言基础”章节断层在当前版本已存在标题，不是本轮主要缺口。
+- 用全量渲染脚本复现表格列数异常：02、03、08、24 章存在 `<td>` 列数与 `<th>` 列数不一致的表格行。
+- 根因定位为 `split_table_row()` 对整行直接 `split("|")`，没有识别反引号代码片段和转义竖线。
+- 按 TDD 增加阅读器回归测试：表格中 code span 的 `|` 不拆列、转义 `\|` 保留为普通字符、双反引号 code span 不被单反引号正则拆坏、所有笔记渲染后表格列数必须一致。
+- 红测确认 6 个失败，覆盖 02、03、08、24 章错列表格和第 12 章 `` `d0`` 行内代码显示异常。
+- 修复 `reader_server.py`：`split_table_row()` 改为跟踪反引号代码片段和转义竖线；`render_inline()` 改为先抽取完整 code span，再处理链接和加粗。
+- 修复后 `python3 -m unittest tests/test_reader_server.py` 11 个测试通过；全量渲染表格列数检查通过；关键样例 `<code>r | s</code>`、`<code>S -&gt; A S | epsilon</code>`、`<code>Gamma |- exp : ty</code>`、`<code> `d0</code>` 均能在对应页面中渲染出来。
+- 一次 `rg` 命令因双引号中的反引号被 zsh 解释为命令替换，误输出大量内容；后续改用固定字符串/脚本扫描。
+- 一次 Markdown 表格源检查误报第 09 章 ASCII 内存图中的 `|                  |`；确认该行在 fenced code block 内，已改用忽略代码块的检查脚本并通过。
+- 提交前完整验证通过：`python3 -m unittest tests/test_reader_server.py` 11 个测试通过；忽略代码块的 Markdown 表格检查通过；所有笔记渲染后表格列数一致；关键行内代码样例检查通过；`git diff --check` 无输出。
