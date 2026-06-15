@@ -93,6 +93,21 @@ class ReaderServerTests(unittest.TestCase):
 
         self.assertIn('href="/compiler-notes/note/23_', html)
 
+    def test_multiline_svg_html_block_is_preserved(self):
+        html = reader_server.markdown_to_html(
+            '<figure class="svg-diagram">\n'
+            '  <svg viewBox="0 0 120 40" role="img" aria-labelledby="t">\n'
+            "    <title id=\"t\">示意图</title>\n"
+            '    <path d="M10 20 H110" />\n'
+            "  </svg>\n"
+            "</figure>"
+        )
+
+        self.assertIn('<figure class="svg-diagram">', html)
+        self.assertIn('<svg viewBox="0 0 120 40"', html)
+        self.assertIn('<path d="M10 20 H110" />', html)
+        self.assertNotIn("&lt;svg", html)
+
     def test_table_cells_preserve_pipes_inside_inline_code(self):
         html = reader_server.markdown_to_html(
             "| 正则 | 含义 |\n"

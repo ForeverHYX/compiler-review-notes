@@ -211,15 +211,36 @@ T → id
 
 `id + id` 的 parse tree：
 
-```text
-        E
-      / | \
-     E  +  T
-     |     |
-     T     id
-     |
-    id
-```
+<figure class="svg-diagram" style="--diagram-max: 640px; --diagram-min: 460px;">
+  <svg class="compiler-diagram" viewBox="0 0 640 310" role="img" aria-labelledby="parse-tree-id-plus-id-title">
+    <title id="parse-tree-id-plus-id-title">id + id 的 parse tree</title>
+    <defs>
+      <marker id="parse-tree-id-plus-id-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 Z" fill="#607476" />
+      </marker>
+    </defs>
+    <circle class="node-soft" cx="320" cy="42" r="24" />
+    <text x="320" y="47" text-anchor="middle" class="title">E</text>
+    <circle class="node" cx="210" cy="112" r="22" />
+    <text x="210" y="117" text-anchor="middle">E</text>
+    <circle class="node" cx="320" cy="112" r="20" />
+    <text x="320" y="117" text-anchor="middle">+</text>
+    <circle class="node" cx="430" cy="112" r="22" />
+    <text x="430" y="117" text-anchor="middle">T</text>
+    <circle class="node" cx="210" cy="190" r="22" />
+    <text x="210" y="195" text-anchor="middle">T</text>
+    <rect class="node" x="392" y="168" width="76" height="44" rx="8" />
+    <text x="430" y="195" text-anchor="middle">id</text>
+    <rect class="node" x="172" y="246" width="76" height="44" rx="8" />
+    <text x="210" y="273" text-anchor="middle">id</text>
+    <path class="edge" marker-end="url(#parse-tree-id-plus-id-arrow)" d="M300 55 L230 98" />
+    <path class="edge" marker-end="url(#parse-tree-id-plus-id-arrow)" d="M320 66 V88" />
+    <path class="edge" marker-end="url(#parse-tree-id-plus-id-arrow)" d="M340 55 L410 98" />
+    <path class="edge" marker-end="url(#parse-tree-id-plus-id-arrow)" d="M210 134 V164" />
+    <path class="edge" marker-end="url(#parse-tree-id-plus-id-arrow)" d="M430 134 V164" />
+    <path class="edge" marker-end="url(#parse-tree-id-plus-id-arrow)" d="M210 212 V242" />
+  </svg>
+</figure>
 
 从左到右读叶子是：
 
@@ -284,25 +305,55 @@ id + (id * id)
 
 对二义表达式文法，`id + id * id` 的两棵树可写成：
 
-```text
-树 1：根是 *
-        E
-      / | \
-     E  *  E
-   / | \   |
-  E  +  E  id
-  |     |
- id    id
-
-树 2：根是 +
-        E
-      / | \
-     E  +  E
-     |    / | \
-    id   E  *  E
-         |     |
-        id    id
-```
+<figure class="svg-diagram" style="--diagram-max: 940px; --diagram-min: 760px;">
+  <svg class="compiler-diagram" viewBox="0 0 940 360" role="img" aria-labelledby="ambiguous-expression-trees-title">
+    <title id="ambiguous-expression-trees-title">id + id * id 的两棵不同 parse tree</title>
+    <text x="230" y="28" text-anchor="middle" class="title">树 1：根是 *</text>
+    <text x="705" y="28" text-anchor="middle" class="title">树 2：根是 +</text>
+    <g>
+      <text x="230" y="64" text-anchor="middle" class="title">E</text>
+      <text x="130" y="124" text-anchor="middle">E</text>
+      <text x="230" y="124" text-anchor="middle">*</text>
+      <text x="330" y="124" text-anchor="middle">E</text>
+      <text x="70" y="194" text-anchor="middle">E</text>
+      <text x="130" y="194" text-anchor="middle">+</text>
+      <text x="190" y="194" text-anchor="middle">E</text>
+      <text x="330" y="194" text-anchor="middle">id</text>
+      <text x="70" y="268" text-anchor="middle">id</text>
+      <text x="190" y="268" text-anchor="middle">id</text>
+      <path class="edge" d="M218 72 L138 112" />
+      <path class="edge" d="M230 72 V108" />
+      <path class="edge" d="M242 72 L322 112" />
+      <path class="edge" d="M122 132 L78 182" />
+      <path class="edge" d="M130 132 V178" />
+      <path class="edge" d="M138 132 L182 182" />
+      <path class="edge" d="M330 132 V178" />
+      <path class="edge" d="M70 202 V250" />
+      <path class="edge" d="M190 202 V250" />
+    </g>
+    <g>
+      <text x="705" y="64" text-anchor="middle" class="title">E</text>
+      <text x="605" y="124" text-anchor="middle">E</text>
+      <text x="705" y="124" text-anchor="middle">+</text>
+      <text x="805" y="124" text-anchor="middle">E</text>
+      <text x="605" y="194" text-anchor="middle">id</text>
+      <text x="745" y="194" text-anchor="middle">E</text>
+      <text x="805" y="194" text-anchor="middle">*</text>
+      <text x="865" y="194" text-anchor="middle">E</text>
+      <text x="745" y="268" text-anchor="middle">id</text>
+      <text x="865" y="268" text-anchor="middle">id</text>
+      <path class="edge" d="M693 72 L613 112" />
+      <path class="edge" d="M705 72 V108" />
+      <path class="edge" d="M717 72 L797 112" />
+      <path class="edge" d="M605 132 V178" />
+      <path class="edge" d="M797 132 L753 182" />
+      <path class="edge" d="M805 132 V178" />
+      <path class="edge" d="M813 132 L857 182" />
+      <path class="edge" d="M745 202 V250" />
+      <path class="edge" d="M865 202 V250" />
+    </g>
+  </svg>
+</figure>
 
 解决方法通常是重写文法，把优先级和结合性编码进去：
 

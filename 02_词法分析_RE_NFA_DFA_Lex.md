@@ -282,13 +282,29 @@ DFA 执行负责 How: 怎样线性扫描并快速判断
 
 词法分析器最终常用 DFA 执行。关系如下：
 
-```mermaid
-flowchart LR
-  RE[Regular Expression] --> NFA[NFA]
-  NFA --> DFA[DFA]
-  DFA --> MinDFA[Minimized DFA]
-  MinDFA --> Table[Table-driven Lexer]
-```
+<figure class="svg-diagram" style="--diagram-max: 760px; --diagram-min: 520px;">
+  <svg class="compiler-diagram" viewBox="0 0 760 120" role="img" aria-labelledby="lex-pipeline-title">
+    <title id="lex-pipeline-title">正则表达式到表驱动词法分析器的流程</title>
+    <defs>
+      <marker id="lex-pipeline-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 Z" fill="#607476" />
+      </marker>
+    </defs>
+    <rect class="node-soft" x="24" y="35" width="150" height="50" rx="8" />
+    <text x="99" y="55" text-anchor="middle" class="title">Regular Expression</text>
+    <text x="99" y="74" text-anchor="middle" class="small">模式规格</text>
+    <path class="edge" marker-end="url(#lex-pipeline-arrow)" d="M174 60 H232" />
+    <rect class="node" x="232" y="35" width="96" height="50" rx="8" />
+    <text x="280" y="65" text-anchor="middle" class="title">NFA</text>
+    <path class="edge" marker-end="url(#lex-pipeline-arrow)" d="M328 60 H386" />
+    <rect class="node" x="386" y="35" width="96" height="50" rx="8" />
+    <text x="434" y="65" text-anchor="middle" class="title">DFA</text>
+    <path class="edge" marker-end="url(#lex-pipeline-arrow)" d="M482 60 H540" />
+    <rect class="node" x="540" y="35" width="180" height="50" rx="8" />
+    <text x="630" y="55" text-anchor="middle" class="title">Minimized DFA</text>
+    <text x="630" y="74" text-anchor="middle" class="small">Table-driven Lexer</text>
+  </svg>
+</figure>
 
 正则表达式适合人写；自动机适合机器执行。词法分析器生成工具一般做这条路线：
 
@@ -324,11 +340,30 @@ NFA 的“非确定”体现在两点：
 
 例如：
 
-```text
-state 0 --a--> state 1
-state 0 --a--> state 2
-state 0 --ε--> state 3
-```
+<figure class="svg-diagram" style="--diagram-max: 700px; --diagram-min: 520px;">
+  <svg class="compiler-diagram" viewBox="0 0 700 220" role="img" aria-labelledby="nfa-nondet-title">
+    <title id="nfa-nondet-title">NFA 同一状态可以有多条后继和 ε 边</title>
+    <defs>
+      <marker id="nfa-nondet-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 Z" fill="#607476" />
+      </marker>
+    </defs>
+    <circle class="node-soft" cx="95" cy="110" r="32" />
+    <text x="95" y="115" text-anchor="middle" class="title">state 0</text>
+    <circle class="node" cx="560" cy="50" r="30" />
+    <text x="560" y="55" text-anchor="middle">state 1</text>
+    <circle class="node" cx="560" cy="110" r="30" />
+    <text x="560" y="115" text-anchor="middle">state 2</text>
+    <circle class="node" cx="560" cy="170" r="30" />
+    <text x="560" y="175" text-anchor="middle">state 3</text>
+    <path class="edge" marker-end="url(#nfa-nondet-arrow)" d="M126 100 C230 38 405 28 529 45" />
+    <text x="325" y="35" text-anchor="middle" class="label">a</text>
+    <path class="edge" marker-end="url(#nfa-nondet-arrow)" d="M128 110 H523" />
+    <text x="325" y="100" text-anchor="middle" class="label">a</text>
+    <path class="edge-soft" marker-end="url(#nfa-nondet-arrow)" d="M126 120 C230 182 405 192 529 175" />
+    <text x="325" y="190" text-anchor="middle" class="label">ε</text>
+  </svg>
+</figure>
 
 如果当前在 `state 0` 且下一个输入是 `a`，NFA 可以进入 `state 1` 或 `state 2`；即使不读字符，也可以先进 `state 3`。
 
@@ -457,46 +492,132 @@ Thompson 构造的原则是：每个正则表达式片段都生成一个“单�
 
 识别 `ε`：
 
-```text
-start --ε--> final
-```
+<figure class="svg-diagram" style="--diagram-max: 520px; --diagram-min: 360px;">
+  <svg class="compiler-diagram" viewBox="0 0 520 120" role="img" aria-labelledby="thompson-epsilon-title">
+    <title id="thompson-epsilon-title">Thompson 基本构造：ε</title>
+    <defs>
+      <marker id="thompson-epsilon-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 Z" fill="#607476" />
+      </marker>
+    </defs>
+    <circle class="node-soft" cx="95" cy="60" r="30" />
+    <text x="95" y="65" text-anchor="middle">start</text>
+    <circle class="node" cx="425" cy="60" r="30" />
+    <circle fill="none" stroke="#89a8a4" stroke-width="1.5" cx="425" cy="60" r="24" />
+    <text x="425" y="65" text-anchor="middle">final</text>
+    <path class="edge-soft" marker-end="url(#thompson-epsilon-arrow)" d="M125 60 H389" />
+    <text x="260" y="48" text-anchor="middle" class="label">ε</text>
+  </svg>
+</figure>
 
 识别字符 `a`：
 
-```text
-start --a--> final
-```
+<figure class="svg-diagram" style="--diagram-max: 520px; --diagram-min: 360px;">
+  <svg class="compiler-diagram" viewBox="0 0 520 120" role="img" aria-labelledby="thompson-char-title">
+    <title id="thompson-char-title">Thompson 基本构造：字符 a</title>
+    <defs>
+      <marker id="thompson-char-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 Z" fill="#607476" />
+      </marker>
+    </defs>
+    <circle class="node-soft" cx="95" cy="60" r="30" />
+    <text x="95" y="65" text-anchor="middle">start</text>
+    <circle class="node" cx="425" cy="60" r="30" />
+    <circle fill="none" stroke="#89a8a4" stroke-width="1.5" cx="425" cy="60" r="24" />
+    <text x="425" y="65" text-anchor="middle">final</text>
+    <path class="edge" marker-end="url(#thompson-char-arrow)" d="M125 60 H389" />
+    <text x="260" y="48" text-anchor="middle" class="label">a</text>
+  </svg>
+</figure>
 
 ### 并 `s | t`
 
-```text
-          ε      N(s)      ε
-       /----------> [s ...] ---------------\
-start                                      final
-       \----------> [t ...] ---------------/
-          ε      N(t)      ε
-```
+<figure class="svg-diagram" style="--diagram-max: 780px; --diagram-min: 560px;">
+  <svg class="compiler-diagram" viewBox="0 0 780 240" role="img" aria-labelledby="thompson-union-title">
+    <title id="thompson-union-title">Thompson 构造：并 s 或 t</title>
+    <defs>
+      <marker id="thompson-union-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 Z" fill="#607476" />
+      </marker>
+    </defs>
+    <circle class="node-soft" cx="80" cy="120" r="30" />
+    <text x="80" y="125" text-anchor="middle">start</text>
+    <rect class="node" x="292" y="48" width="150" height="54" rx="8" />
+    <text x="367" y="80" text-anchor="middle" class="title">N(s)</text>
+    <rect class="node" x="292" y="138" width="150" height="54" rx="8" />
+    <text x="367" y="170" text-anchor="middle" class="title">N(t)</text>
+    <circle class="node" cx="700" cy="120" r="30" />
+    <circle fill="none" stroke="#89a8a4" stroke-width="1.5" cx="700" cy="120" r="24" />
+    <text x="700" y="125" text-anchor="middle">final</text>
+    <path class="edge-soft" marker-end="url(#thompson-union-arrow)" d="M109 111 C170 76 225 72 286 75" />
+    <text x="190" y="72" text-anchor="middle" class="label">ε</text>
+    <path class="edge-soft" marker-end="url(#thompson-union-arrow)" d="M109 129 C170 164 225 168 286 165" />
+    <text x="190" y="176" text-anchor="middle" class="label">ε</text>
+    <path class="edge-soft" marker-end="url(#thompson-union-arrow)" d="M442 75 C520 72 610 86 672 108" />
+    <text x="545" y="72" text-anchor="middle" class="label">ε</text>
+    <path class="edge-soft" marker-end="url(#thompson-union-arrow)" d="M442 165 C520 168 610 154 672 132" />
+    <text x="545" y="176" text-anchor="middle" class="label">ε</text>
+  </svg>
+</figure>
 
 意思是：不读输入先选择走 `s` 分支或 `t` 分支。
 
 ### 连接 `st`
 
-```text
-start → N(s) → N(t) → final
-```
+<figure class="svg-diagram" style="--diagram-max: 720px; --diagram-min: 520px;">
+  <svg class="compiler-diagram" viewBox="0 0 720 130" role="img" aria-labelledby="thompson-concat-title">
+    <title id="thompson-concat-title">Thompson 构造：连接 st</title>
+    <defs>
+      <marker id="thompson-concat-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 Z" fill="#607476" />
+      </marker>
+    </defs>
+    <circle class="node-soft" cx="70" cy="65" r="28" />
+    <text x="70" y="70" text-anchor="middle">start</text>
+    <rect class="node" x="205" y="38" width="110" height="54" rx="8" />
+    <text x="260" y="70" text-anchor="middle" class="title">N(s)</text>
+    <rect class="node" x="405" y="38" width="110" height="54" rx="8" />
+    <text x="460" y="70" text-anchor="middle" class="title">N(t)</text>
+    <circle class="node" cx="650" cy="65" r="28" />
+    <circle fill="none" stroke="#89a8a4" stroke-width="1.5" cx="650" cy="65" r="22" />
+    <text x="650" y="70" text-anchor="middle">final</text>
+    <path class="edge" marker-end="url(#thompson-concat-arrow)" d="M98 65 H199" />
+    <path class="edge" marker-end="url(#thompson-concat-arrow)" d="M315 65 H399" />
+    <path class="edge" marker-end="url(#thompson-concat-arrow)" d="M515 65 H616" />
+  </svg>
+</figure>
 
 意思是：先识别 `s`，再识别 `t`。
 
 ### 闭包 `s*`
 
-```text
-                 ε
-          /---------------------\
-          v                     |
-start --ε--> N(s) --ε--> final
-  |                         ^
-  \-------ε-----------/
-```
+<figure class="svg-diagram" style="--diagram-max: 760px; --diagram-min: 560px;">
+  <svg class="compiler-diagram" viewBox="0 0 760 260" role="img" aria-labelledby="thompson-star-title">
+    <title id="thompson-star-title">Thompson 构造：Kleene 闭包 s*</title>
+    <defs>
+      <marker id="thompson-star-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 Z" fill="#607476" />
+      </marker>
+    </defs>
+    <circle class="node-soft" cx="85" cy="145" r="30" />
+    <text x="85" y="150" text-anchor="middle">start</text>
+    <rect class="node" x="300" y="118" width="150" height="54" rx="8" />
+    <text x="375" y="150" text-anchor="middle" class="title">N(s)</text>
+    <circle class="node" cx="675" cy="145" r="30" />
+    <circle fill="none" stroke="#89a8a4" stroke-width="1.5" cx="675" cy="145" r="24" />
+    <text x="675" y="150" text-anchor="middle">final</text>
+    <path class="edge-soft" marker-end="url(#thompson-star-arrow)" d="M115 145 H294" />
+    <text x="205" y="132" text-anchor="middle" class="label">ε</text>
+    <path class="edge-soft" marker-end="url(#thompson-star-arrow)" d="M450 145 H639" />
+    <text x="545" y="132" text-anchor="middle" class="label">ε</text>
+    <path class="edge-soft" marker-end="url(#thompson-star-arrow)" d="M104 124 C190 35 560 35 659 122" />
+    <text x="380" y="42" text-anchor="middle" class="label">跳过：ε</text>
+    <path class="edge-soft" marker-end="url(#thompson-star-arrow)" d="M443 116 C510 70 578 78 648 123" />
+    <text x="560" y="86" text-anchor="middle" class="label">退出：ε</text>
+    <path class="edge-soft" marker-end="url(#thompson-star-arrow)" d="M310 174 C236 226 151 212 101 172" />
+    <text x="206" y="224" text-anchor="middle" class="label">重复：ε</text>
+  </svg>
+</figure>
 
 要能表达三件事：
 
@@ -511,6 +632,48 @@ start --ε--> N(s) --ε--> final
 ```text
 N(a) 连接 N(b*)
 ```
+
+一种标准 Thompson NFA 可以画成：
+
+<figure class="svg-diagram" style="--diagram-max: 820px; --diagram-min: 620px;">
+  <svg class="compiler-diagram" viewBox="0 0 820 270" role="img" aria-labelledby="ab-star-nfa-title">
+    <title id="ab-star-nfa-title">正则表达式 ab* 的 Thompson NFA</title>
+    <defs>
+      <marker id="ab-star-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 Z" fill="#607476" />
+      </marker>
+    </defs>
+    <circle class="node-soft" cx="70" cy="135" r="26" />
+    <text x="70" y="140" text-anchor="middle">q0</text>
+    <circle class="node" cx="190" cy="135" r="26" />
+    <text x="190" y="140" text-anchor="middle">q1</text>
+    <circle class="node" cx="320" cy="135" r="26" />
+    <text x="320" y="140" text-anchor="middle">q2</text>
+    <circle class="node" cx="470" cy="72" r="26" />
+    <text x="470" y="77" text-anchor="middle">q3</text>
+    <circle class="node" cx="610" cy="72" r="26" />
+    <text x="610" y="77" text-anchor="middle">q4</text>
+    <circle class="node" cx="735" cy="135" r="26" />
+    <circle fill="none" stroke="#89a8a4" stroke-width="1.5" cx="735" cy="135" r="20" />
+    <text x="735" y="140" text-anchor="middle">q5</text>
+    <path class="edge" marker-end="url(#ab-star-arrow)" d="M96 135 H158" />
+    <text x="128" y="122" text-anchor="middle" class="label">a</text>
+    <path class="edge-soft" marker-end="url(#ab-star-arrow)" d="M216 135 H288" />
+    <text x="252" y="122" text-anchor="middle" class="label">ε</text>
+    <path class="edge-soft" marker-end="url(#ab-star-arrow)" d="M345 124 C382 94 408 78 438 73" />
+    <text x="386" y="86" text-anchor="middle" class="label">ε</text>
+    <path class="edge" marker-end="url(#ab-star-arrow)" d="M496 72 H578" />
+    <text x="540" y="59" text-anchor="middle" class="label">b</text>
+    <path class="edge-soft" marker-end="url(#ab-star-arrow)" d="M604 47 C570 10 510 10 476 46" />
+    <text x="540" y="22" text-anchor="middle" class="label">ε repeat</text>
+    <path class="edge-soft" marker-end="url(#ab-star-arrow)" d="M344 148 C440 206 610 203 712 148" />
+    <text x="520" y="215" text-anchor="middle" class="label">ε skip b*</text>
+    <path class="edge-soft" marker-end="url(#ab-star-arrow)" d="M634 82 C672 95 694 108 712 122" />
+    <text x="680" y="91" text-anchor="middle" class="label">ε exit</text>
+    <text x="70" y="203" text-anchor="middle" class="small">start</text>
+    <text x="735" y="203" text-anchor="middle" class="small">final</text>
+  </svg>
+</figure>
 
 它接受：
 
@@ -575,7 +738,7 @@ while worklist not empty:
     T = pop(worklist)
     for each input symbol a:
         U = ε-closure(move(T, a))
-        add transition T --a--> U
+        add transition from T to U labeled a
         if U is new:
             add U to worklist
 ```
@@ -596,13 +759,37 @@ while worklist not empty:
 
 假设 NFA：
 
-```text
-0 --ε--> 1
-0 --ε--> 3
-1 --a--> 2
-3 --b--> 4
-2,4 是终态
-```
+<figure class="svg-diagram" style="--diagram-max: 720px; --diagram-min: 520px;">
+  <svg class="compiler-diagram" viewBox="0 0 720 230" role="img" aria-labelledby="subset-nfa-title">
+    <title id="subset-nfa-title">识别 a 或 b 的 NFA</title>
+    <defs>
+      <marker id="subset-nfa-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 Z" fill="#607476" />
+      </marker>
+    </defs>
+    <circle class="node-soft" cx="80" cy="115" r="28" />
+    <text x="80" y="120" text-anchor="middle">0</text>
+    <circle class="node" cx="275" cy="65" r="26" />
+    <text x="275" y="70" text-anchor="middle">1</text>
+    <circle class="node" cx="500" cy="65" r="26" />
+    <circle fill="none" stroke="#89a8a4" stroke-width="1.5" cx="500" cy="65" r="20" />
+    <text x="500" y="70" text-anchor="middle">2</text>
+    <circle class="node" cx="275" cy="165" r="26" />
+    <text x="275" y="170" text-anchor="middle">3</text>
+    <circle class="node" cx="500" cy="165" r="26" />
+    <circle fill="none" stroke="#89a8a4" stroke-width="1.5" cx="500" cy="165" r="20" />
+    <text x="500" y="170" text-anchor="middle">4</text>
+    <path class="edge-soft" marker-end="url(#subset-nfa-arrow)" d="M107 108 C160 78 196 66 244 65" />
+    <text x="170" y="76" text-anchor="middle" class="label">ε</text>
+    <path class="edge-soft" marker-end="url(#subset-nfa-arrow)" d="M107 122 C160 152 196 164 244 165" />
+    <text x="170" y="163" text-anchor="middle" class="label">ε</text>
+    <path class="edge" marker-end="url(#subset-nfa-arrow)" d="M301 65 H468" />
+    <text x="385" y="52" text-anchor="middle" class="label">a</text>
+    <path class="edge" marker-end="url(#subset-nfa-arrow)" d="M301 165 H468" />
+    <text x="385" y="152" text-anchor="middle" class="label">b</text>
+    <text x="610" y="118" text-anchor="middle" class="small">2, 4 是终态</text>
+  </svg>
+</figure>
 
 它识别 `a|b`。
 

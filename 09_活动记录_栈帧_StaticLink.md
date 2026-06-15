@@ -25,21 +25,30 @@
 
 ## 运行时内存区域
 
-```text
-高地址
-+------------------+
-| stack            |  函数调用、局部变量
-|        ↓         |
-|                  |
-|        ↑         |
-| heap             |  动态分配对象
-+------------------+
-| static data      |  全局变量、字符串常量
-+------------------+
-| code             |  程序指令
-+------------------+
-低地址
-```
+<figure class="svg-diagram" style="--diagram-max: 620px; --diagram-min: 420px;">
+  <svg class="compiler-diagram" viewBox="0 0 620 430" role="img" aria-labelledby="runtime-memory-layout-title">
+    <title id="runtime-memory-layout-title">运行时内存区域布局</title>
+    <rect class="node-soft" x="170" y="34" width="230" height="150" rx="8" />
+    <text x="196" y="66" class="title">stack</text>
+    <text x="430" y="66" class="label">函数调用、局部变量</text>
+    <path class="edge" d="M285 82 V142" />
+    <path d="M278 134 L285 146 L292 134 Z" fill="#607476" />
+    <rect class="node" x="170" y="184" width="230" height="112" rx="8" />
+    <text x="196" y="268" class="title">heap</text>
+    <text x="430" y="268" class="label">动态分配对象</text>
+    <path class="edge" d="M285 266 V206" />
+    <path d="M278 214 L285 202 L292 214 Z" fill="#607476" />
+    <rect class="node" x="170" y="296" width="230" height="54" rx="8" />
+    <text x="196" y="328" class="title">static data</text>
+    <text x="430" y="328" class="label">全局变量、字符串常量</text>
+    <rect class="node" x="170" y="350" width="230" height="54" rx="8" />
+    <text x="196" y="382" class="title">code</text>
+    <text x="430" y="382" class="label">程序指令</text>
+    <text x="95" y="48" text-anchor="middle" class="label">高地址</text>
+    <text x="95" y="398" text-anchor="middle" class="label">低地址</text>
+    <path class="edge-soft" d="M95 66 V380" />
+  </svg>
+</figure>
 
 栈用于短生命周期的调用信息；堆用于生命周期不由调用栈决定的对象。
 
@@ -215,9 +224,24 @@ function outer() =
 
 `inner` 访问 `x` 时，不能沿调用者链乱找，而要沿词法嵌套链找到 `outer` 的栈帧。
 
-```text
-inner frame --static link--> outer frame
-```
+<figure class="svg-diagram" style="--diagram-max: 620px; --diagram-min: 420px;">
+  <svg class="compiler-diagram" viewBox="0 0 620 160" role="img" aria-labelledby="static-link-title">
+    <title id="static-link-title">inner frame 通过 static link 指向 outer frame</title>
+    <defs>
+      <marker id="static-link-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 Z" fill="#607476" />
+      </marker>
+    </defs>
+    <rect class="node-soft" x="48" y="52" width="160" height="58" rx="8" />
+    <text x="128" y="76" text-anchor="middle" class="title">inner frame</text>
+    <text x="128" y="96" text-anchor="middle" class="small">当前函数</text>
+    <rect class="node" x="412" y="52" width="160" height="58" rx="8" />
+    <text x="492" y="76" text-anchor="middle" class="title">outer frame</text>
+    <text x="492" y="96" text-anchor="middle" class="small">词法父函数</text>
+    <path class="edge" marker-end="url(#static-link-arrow)" d="M208 81 H406" />
+    <text x="310" y="67" text-anchor="middle" class="label">static link</text>
+  </svg>
+</figure>
 
 static link 可能跳过若干 dynamic frames。它永远指向词法父函数最近一次活跃的 frame，而不是“谁调用我”。
 

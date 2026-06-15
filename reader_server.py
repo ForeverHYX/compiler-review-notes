@@ -16,6 +16,12 @@ from urllib.parse import quote, unquote, urlparse
 NOTE_RE = re.compile(r"^(\d{2})_.+\.md$")
 ANSWER_FILE = "23_练习参考答案.md"
 EXCLUDED_MD = {"task_plan.md", "findings.md", "progress.md"}
+RAW_HTML_BLOCK_TAG_RE = re.compile(
+    r"^\s*</?(?:article|aside|blockquote|details|div|figure|figcaption|footer|header|nav|"
+    r"ol|p|pre|section|summary|svg|table|tbody|td|tfoot|th|thead|tr|ul|li|h[1-6])\b",
+    flags=re.I,
+)
+OPENING_HTML_TAG_RE = re.compile(r"^\s*<([A-Za-z][A-Za-z0-9:-]*)\b")
 
 
 @dataclass(frozen=True)
@@ -275,12 +281,8 @@ def markdown_to_html(markdown: str, base_path: str = "") -> str:
             index += 1
             continue
 
-        if line.startswith("<"):
-            raw_lines = [line]
-            index += 1
-            while index < len(lines) and lines[index].startswith("<"):
-                raw_lines.append(lines[index])
-                index += 1
+        if is_raw_html_block_start(line):
+            raw_lines, index = collect_raw_html_block(lines, index)
             blocks.append("\n".join(raw_lines))
             continue
 
@@ -344,7 +346,7 @@ def markdown_to_html(markdown: str, base_path: str = "") -> str:
             next_line = lines[index]
             if (
                 next_line.startswith("```")
-                or next_line.startswith("<")
+                or is_raw_html_block_start(next_line)
                 or next_line.startswith("#")
                 or re.match(r"^\s*([-*]|\d+\.)\s+", next_line)
                 or is_table_start(lines, index)
@@ -355,6 +357,34 @@ def markdown_to_html(markdown: str, base_path: str = "") -> str:
         blocks.append(f"<p>{render_inline(' '.join(paragraph_lines), base_path=base_path)}</p>")
 
     return "\n".join(blocks)
+
+
+def is_raw_html_block_start(line: str) -> bool:
+    return RAW_HTML_BLOCK_TAG_RE.match(line) is not None
+
+
+def collect_raw_html_block(lines: list[str], index: int) -> tuple[list[str], int]:
+    first_line = lines[index]
+    raw_lines = [first_line]
+    index += 1
+
+    tag_match = OPENING_HTML_TAG_RE.match(first_line)
+    closing_tag = None
+    if tag_match and not first_line.rstrip().endswith("/>"):
+        tag = tag_match.group(1).lower()
+        if f"</{tag}>" not in first_line.lower():
+            closing_tag = f"</{tag}>"
+    if closing_tag is None:
+        return raw_lines, index
+
+    while index < len(lines):
+        raw_lines.append(lines[index])
+        if closing_tag in lines[index].lower():
+            index += 1
+            break
+        index += 1
+
+    return raw_lines, index
 
 
 def is_table_start(lines: list[str], index: int) -> bool:
@@ -584,6 +614,32 @@ def page_template(title: str, body: str, notes: list[Note], current: str | None 
       line-height: 1.55;
     }}
     pre code {{ background: transparent; border: 0; color: inherit; padding: 0; }}
+    .svg-diagram {{
+      margin: 0 0 18px;
+      overflow-x: auto;
+    }}
+    .svg-diagram svg {{
+      display: block;
+      width: max(100%, var(--diagram-min, 520px));
+      max-width: var(--diagram-max, 960px);
+      height: auto;
+      background: #fbfcfb;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }}
+    .compiler-diagram text {{
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans CJK SC", "PingFang SC", sans-serif;
+      fill: var(--ink);
+      font-size: 14px;
+    }}
+    .compiler-diagram .node {{ fill: #ffffff; stroke: #89a8a4; stroke-width: 1.5; }}
+    .compiler-diagram .node-soft {{ fill: #eef7f6; stroke: #79a7a3; stroke-width: 1.5; }}
+    .compiler-diagram .node-warn {{ fill: #fff6e8; stroke: #d69b50; stroke-width: 1.5; }}
+    .compiler-diagram .edge {{ fill: none; stroke: #607476; stroke-width: 1.8; }}
+    .compiler-diagram .edge-soft {{ fill: none; stroke: #8a9799; stroke-width: 1.4; stroke-dasharray: 5 4; }}
+    .compiler-diagram .label {{ fill: #435154; font-size: 13px; }}
+    .compiler-diagram .small {{ font-size: 12px; }}
+    .compiler-diagram .title {{ font-weight: 750; }}
     table {{ width: 100%; border-collapse: collapse; background: var(--panel); }}
     th, td {{ border: 1px solid var(--line); padding: 8px 10px; vertical-align: top; }}
     th {{ background: #eef3ed; text-align: left; }}

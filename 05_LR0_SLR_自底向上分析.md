@@ -180,17 +180,15 @@ S' → S EOF
 
 LR 题最容易因为漏项而错。建议按这个表格流程写：
 
-```text
-1. 增广文法：S' → S EOF
-2. 写 I0 = closure(S' → . S EOF)
-3. 对 I0 中点后面的每个符号 X 计算 goto(I0, X)
-4. 新得到的项集编号为 I1, I2, ...
-5. 对每个新项集重复第 3 步
-6. 没有新项集时停止
-7. 画 DFA：Ii --X--> Ij
-8. 填 ACTION/GOTO 表
-9. 用状态栈模拟输入串
-```
+1. 增广文法：$S' \to S\ EOF$。
+2. 写 $I_0 = closure(S' \to .\ S\ EOF)$。
+3. 对 $I_0$ 中点后面的每个符号 $X$ 计算 $goto(I_0, X)$。
+4. 新得到的项集编号为 $I_1, I_2, \ldots$。
+5. 对每个新项集重复第 3 步。
+6. 没有新项集时停止。
+7. 画 DFA：$I_i \xrightarrow{X} I_j$。
+8. 填 `ACTION/GOTO` 表。
+9. 用状态栈模拟输入串。
 
 手算 `closure` 时只看“点后面”的符号：
 
@@ -209,11 +207,7 @@ A → α . B β
 
 ## 从 LR(0) DFA 到 ACTION/GOTO 表
 
-如果状态 `i` 有边：
-
-```text
-i -- terminal a --> j
-```
+如果状态 `i` 有终结符边 $i \xrightarrow{a} j$：
 
 则：
 
@@ -241,12 +235,9 @@ S' → S . EOF
 
 则读到 EOF 后 accept。
 
-非终结符边填 `GOTO` 表：
+非终结符边 $i \xrightarrow{A} j$ 填 `GOTO` 表：
 
-```text
-i -- nonterminal A --> j
-GOTO[i,A] = j
-```
+$$GOTO[i,A] = j$$
 
 考试填表可以按下面顺序检查，能减少漏格：
 
@@ -375,16 +366,49 @@ goto(I6, id) = I4
 
 没有新状态后停止。DFA 边：
 
-```text
-I0 --S--> I1
-I0 --E--> I2
-I0 --T--> I3
-I0 --id--> I4
-I1 --EOF--> I5
-I2 --+--> I6
-I6 --T--> I7
-I6 --id--> I4
-```
+<figure class="svg-diagram" style="--diagram-max: 820px; --diagram-min: 620px;">
+  <svg class="compiler-diagram" viewBox="0 0 820 420" role="img" aria-labelledby="lr0-example-dfa-title">
+    <title id="lr0-example-dfa-title">LR(0) 项集 DFA 边</title>
+    <defs>
+      <marker id="lr0-example-dfa-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 Z" fill="#607476" />
+      </marker>
+    </defs>
+    <circle class="node-soft" cx="90" cy="210" r="30" />
+    <text x="90" y="215" text-anchor="middle" class="title">I0</text>
+    <circle class="node" cx="285" cy="70" r="28" />
+    <text x="285" y="75" text-anchor="middle">I1</text>
+    <circle class="node" cx="285" cy="165" r="28" />
+    <text x="285" y="170" text-anchor="middle">I2</text>
+    <circle class="node" cx="285" cy="255" r="28" />
+    <text x="285" y="260" text-anchor="middle">I3</text>
+    <circle class="node" cx="285" cy="345" r="28" />
+    <text x="285" y="350" text-anchor="middle">I4</text>
+    <circle class="node" cx="535" cy="70" r="28" />
+    <circle fill="none" stroke="#89a8a4" stroke-width="1.5" cx="535" cy="70" r="22" />
+    <text x="535" y="75" text-anchor="middle">I5</text>
+    <circle class="node" cx="535" cy="165" r="28" />
+    <text x="535" y="170" text-anchor="middle">I6</text>
+    <circle class="node" cx="720" cy="165" r="28" />
+    <text x="720" y="170" text-anchor="middle">I7</text>
+    <path class="edge" marker-end="url(#lr0-example-dfa-arrow)" d="M115 194 C165 122 205 86 252 74" />
+    <text x="185" y="113" text-anchor="middle" class="label">S</text>
+    <path class="edge" marker-end="url(#lr0-example-dfa-arrow)" d="M119 204 C165 178 205 166 251 165" />
+    <text x="185" y="170" text-anchor="middle" class="label">E</text>
+    <path class="edge" marker-end="url(#lr0-example-dfa-arrow)" d="M119 217 C165 242 205 254 251 255" />
+    <text x="185" y="249" text-anchor="middle" class="label">T</text>
+    <path class="edge" marker-end="url(#lr0-example-dfa-arrow)" d="M113 229 C165 306 205 341 252 346" />
+    <text x="183" y="316" text-anchor="middle" class="label">id</text>
+    <path class="edge" marker-end="url(#lr0-example-dfa-arrow)" d="M313 70 H501" />
+    <text x="410" y="57" text-anchor="middle" class="label">EOF</text>
+    <path class="edge" marker-end="url(#lr0-example-dfa-arrow)" d="M313 165 H501" />
+    <text x="410" y="152" text-anchor="middle" class="label">+</text>
+    <path class="edge" marker-end="url(#lr0-example-dfa-arrow)" d="M563 165 H686" />
+    <text x="625" y="152" text-anchor="middle" class="label">T</text>
+    <path class="edge" marker-end="url(#lr0-example-dfa-arrow)" d="M518 188 C454 272 388 325 315 342" />
+    <text x="430" y="306" text-anchor="middle" class="label">id</text>
+  </svg>
+</figure>
 
 ### SLR ACTION/GOTO 表
 
