@@ -328,16 +328,18 @@ def markdown_to_html(markdown: str, base_path: str = "") -> str:
             blocks.append("<ul>" + "".join(items) + "</ul>")
             continue
 
-        ordered = re.match(r"^\s*\d+\.\s+(.+)$", line)
+        ordered = re.match(r"^\s*(\d+)\.\s+(.+)$", line)
         if ordered:
+            start_number = int(ordered.group(1))
             items = []
             while index < len(lines):
-                item = re.match(r"^\s*\d+\.\s+(.+)$", lines[index])
+                item = re.match(r"^\s*(\d+)\.\s+(.+)$", lines[index])
                 if not item:
                     break
-                items.append(f"<li>{render_inline(item.group(1).strip(), base_path=base_path)}</li>")
+                items.append(f"<li>{render_inline(item.group(2).strip(), base_path=base_path)}</li>")
                 index += 1
-            blocks.append("<ol>" + "".join(items) + "</ol>")
+            start_attr = f' start="{start_number}"' if start_number != 1 else ""
+            blocks.append(f"<ol{start_attr}>" + "".join(items) + "</ol>")
             continue
 
         paragraph_lines = [line.strip()]

@@ -126,6 +126,12 @@ class ReaderServerTests(unittest.TestCase):
         self.assertIn("<code> `d0</code>", html)
         self.assertNotIn("<code> </code>d0", html)
 
+    def test_ordered_lists_preserve_explicit_start_after_block_breaks(self):
+        html = reader_server.markdown_to_html("1. 第一题\n\n中间解释段落。\n\n2. 第二题")
+
+        self.assertIn("<ol><li>第一题</li></ol>", html)
+        self.assertIn('<ol start="2"><li>第二题</li></ol>', html)
+
     def test_rendered_note_tables_have_consistent_column_counts(self):
         answer_index = reader_server.load_answer_index(ROOT)
 

@@ -163,3 +163,19 @@
 - 已提交并推送显示修复：`2ca5831 Fix reader table rendering issues`。
 - 已部署 `2ca5831` 到服务器；服务器端阅读器测试 11 个通过，`compiler-review-notes.service` 为 active。
 - 服务器本机 HTTP 验证通过：首页和 02、03、08、12、24 章关键样例均返回修复后的行内代码；公网 HTTPS 验证通过：`https://foreverhyx.top/compiler-notes/` 可访问，24 章回忆卷正则表达式样例不再被表格拆列。
+
+## 2026-06-15
+
+- 用户新增要求：所有章节练习题答案都要严格检查；在线 `compiler-notes` 也要修复；所有字符画应换成 SVG；小例答案要补齐；特别指出答案抽屉题号全部显示 `1.`，以及第 02 章第 2 题要求从 NFA 出发却直接画 DFA。
+- 恢复 `task_plan.md`、`progress.md`、`findings.md`，确认当前仓库除 `.omc/` 未跟踪目录外没有其它未提交状态。
+- 已定位答案题号显示异常的根因：阅读器的有序列表渲染丢弃 Markdown 显式编号，多个 `<ol>` 分段都会从浏览器默认 1 开始。
+- 已记录第 02 章第 2 题内容缺陷：答案需要补 NFA 构造和从 NFA 子集构造到 DFA 的过程，而不是只给直接 DFA。
+- 按 TDD 增加 `test_ordered_lists_preserve_explicit_start_after_block_breaks`：先确认失败，失败输出显示第二段 `2.` 被渲染成普通 `<ol>`。
+- 修复 `reader_server.py` 有序列表渲染，列表分段首项不是 1 时输出 `<ol start="N">`；新增单测通过，完整 `python3 -m unittest tests.test_reader_server` 14 个测试通过。
+- 用脚本抽取第 01-19 章 `## 练习` 与 `23_练习参考答案.md` 的对应答案，发现第 08 章第 3 题空编号、第 12 章 6 题只有 4 条答案、第 13 章 6 题只有 4 条答案。
+- 已修复第 02 章第 2 题：补 NFA 图、NFA 转移表、子集构造 DFA 表和接受性检查，答案不再直接跳到 DFA。
+- 已修复第 08、12、13 章答案题号与缺题问题；第 12 章补 optimal/optimum 与 `CALL` caller-save `dst`，第 13 章补 move coalescing 特殊建边与 predecessor/out 判断。
+- 已修复综合题第 2、5、6、17、18、19、20 题答案：补 Thompson NFA/subset construction、递归下降说明、LR(0) 冲突说明、Briggs/George 判据、static link SVG、GC SVG 和对象布局表格。
+- 已将第 20 章 GC 题面文本堆图改为 SVG，将第 17 章对象基本布局文本块改为表格，并修正第 02 章术语表 `empty string, ε` 为 `empty string, $\epsilon$`。
+- 自动审计通过：第 01-19 章练习题号与答案题号一致；第 20 章 21 个综合题标题与 21 个答案标题一致；答案抽屉 HTML 中第 02 章分段有序列表输出 `<ol start="2">` 等起始编号；全量渲染无表格列数错乱、无转义 SVG、无 mermaid 残留。
+- 当前本地验证通过：`python3 -m unittest tests.test_reader_server` 14 个测试通过，`python3 -m py_compile reader_server.py` 无输出。

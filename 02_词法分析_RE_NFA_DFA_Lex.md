@@ -1226,9 +1226,9 @@ baa
 | pattern | 模式 | 描述 lexeme 集合 |
 | alphabet | 字母表 | 符号集合 |
 | string | 串 | 符号序列 |
-| empty string, ε | 空串 | 长度为 0 |
+| empty string, $\epsilon$ | 空串 | 长度为 0 |
 | regular expression, RE | 正则表达式 | 描述正则语言 |
-| alternation | 并/选择 | `r|s` |
+| alternation | 并/选择 | `r | s` |
 | concatenation | 连接 | `rs` |
 | Kleene closure | Kleene 闭包 | `r*` |
 | finite automaton, FA | 有穷自动机 | 识别正则语言 |
