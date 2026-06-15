@@ -179,3 +179,6 @@
 - 已将第 20 章 GC 题面文本堆图改为 SVG，将第 17 章对象基本布局文本块改为表格，并修正第 02 章术语表 `empty string, ε` 为 `empty string, $\epsilon$`。
 - 自动审计通过：第 01-19 章练习题号与答案题号一致；第 20 章 21 个综合题标题与 21 个答案标题一致；答案抽屉 HTML 中第 02 章分段有序列表输出 `<ol start="2">` 等起始编号；全量渲染无表格列数错乱、无转义 SVG、无 mermaid 残留。
 - 当前本地验证通过：`python3 -m unittest tests.test_reader_server` 14 个测试通过，`python3 -m py_compile reader_server.py` 无输出。
+- 已提交并推送练习答案审计修复：`31e6458 Audit and fix exercise answers`。
+- 已部署到 `/opt/compiler-review-notes` 并重启 `compiler-review-notes.service`；服务器端 `python3 -m unittest tests.test_reader_server` 14 个测试通过，服务状态 active。
+- 服务器侧 HTTPS 验证通过：`https://foreverhyx.top/compiler-notes/` 返回 200；第 02 章页面包含 `<ol start="2">` 的 NFA-first 答案；第 20 章页面包含 `comprehensive-gc-question-title` SVG；第 23 章页面包含 “Thompson NFA 编号如下”。本机公网 `curl` 一度 DNS 解析失败，最终以服务器侧公网 HTTPS 验证为准。
