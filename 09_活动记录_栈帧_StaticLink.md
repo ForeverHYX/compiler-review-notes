@@ -70,7 +70,7 @@ PPT 中把运行时环境拆成 code 和 data：
 
 具体布局依赖目标机器和调用约定。
 
-每一次函数调用都会创建一个新的 activation。例如递归函数 `f` 连续调用 `f(3) -> f(6) -> f(12)` 时，三个调用同时活跃，每个调用都有自己的参数 `x` 和局部变量 `y`。这是为什么 activation record 必须是“每次调用一份”，而不是“每个函数一份”。
+每一次函数调用都会创建一个新的 activation。例如递归函数 `f` 连续调用 `f(3) → f(6) → f(12)` 时，三个调用同时活跃，每个调用都有自己的参数 `x` 和局部变量 `y`。这是为什么 activation record 必须是“每次调用一份”，而不是“每个函数一份”。
 
 栈帧能成立的关键假设是：局部变量在函数返回时可以销毁。支持 nested functions 但不支持函数作为值返回时，static link 加 stack frame 通常够用；如果语言允许函数值返回或长期保存，就需要 closure，相关内容放在后半教材拓展里理解即可。
 
@@ -378,9 +378,9 @@ view shift 就是在函数入口把 calling convention 的位置转换成函数�
 display 是一个按词法深度索引的 frame pointer 数组：
 
 ```text
-display[1] -> 最近的 main frame
-display[2] -> 最近的 level2 frame
-display[3] -> 最近的 level3 frame
+display[1] → 最近的 main frame
+display[2] → 最近的 level2 frame
+display[3] → 最近的 level3 frame
 ```
 
 进入深度 `i` 的函数时，保存旧 `display[i]`，再令 `display[i] = current frame`；退出时恢复旧值。访问深度 `i` 的非局部变量时，直接取 `display[i] + offset`。

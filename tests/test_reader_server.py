@@ -58,6 +58,15 @@ class ReaderServerTests(unittest.TestCase):
         self.assertIn("02_词法分析_RE_NFA_DFA_Lex.md", html)
         self.assertIn("ch18 循环优化.pdf", html)
 
+    def test_pages_load_mathjax_for_latex_notation(self):
+        notes = reader_server.discover_notes(ROOT)
+        index = reader_server.load_answer_index(ROOT)
+
+        html = reader_server.render_home_page(ROOT, notes, index)
+
+        self.assertIn("window.MathJax", html)
+        self.assertIn("tex-mml-chtml.js", html)
+
     def test_base_path_prefixes_reader_links(self):
         notes = reader_server.discover_notes(ROOT)
         index = reader_server.load_answer_index(ROOT)

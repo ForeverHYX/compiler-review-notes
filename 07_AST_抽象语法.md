@@ -50,8 +50,8 @@ PPT 开头讲 Attribute Grammar，考试通常只要理解思想：
 属性可以是值、类型、作用域信息、AST 节点、IR 片段等。比如：
 
 ```text
-E -> E1 + T    { E.val = E1.val + T.val }
-T -> num       { T.val = num.val }
+E → E1 + T    { E.val = E1.val + T.val }
+T → num       { T.val = num.val }
 ```
 
 如果属性从子节点传到父节点，叫 synthesized attribute；如果从父节点或左边兄弟传给子节点，叫 inherited attribute。构造 AST 时最常见的是 synthesized attribute：每个右部子树先构造好，再合成父节点。
@@ -242,7 +242,7 @@ PPT 中的语义值栈和状态栈并行变化：
 
 ```text
 shift token:    压入 token 的语义值
-reduce A -> Y1 ... Yk:
+reduce A → Y1 ... Yk:
   弹出 k 个语义值作为 $1 ... $k
   执行动作生成 $$
   把 $$ 压回语义值栈
@@ -283,9 +283,9 @@ visitExp(e):
 文法：
 
 ```text
-E -> E + T | T
-T -> T * F | F
-F -> NUM | ( E )
+E → E + T | T
+T → T * F | F
+F → NUM | ( E )
 ```
 
 输入：
@@ -361,6 +361,6 @@ AST：
 | tree traversal | 树遍历 | 递归访问 AST |
 | tree walking | 树遍历 | traversal 同义 |
 | visitor | 访问者 | 常见遍历模式 |
-| pretty printer | 美化打印器 | AST -> 可读源码 |
+| pretty printer | 美化打印器 | AST → 可读源码 |
 | Absyn | 抽象语法模块 | Appel/Tiger 常见命名 |
 | constructor | 构造函数 | 创建 AST 节点 |

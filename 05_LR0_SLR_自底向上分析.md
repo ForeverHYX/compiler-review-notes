@@ -38,20 +38,20 @@ LR 的含义：
 例：
 
 ```text
-E -> E + T | T
-T -> id
+E → E + T | T
+T → id
 ```
 
 输入 `id + id`：
 
 ```text
 shift id
-reduce T -> id
-reduce E -> T
+reduce T → id
+reduce E → T
 shift +
 shift id
-reduce T -> id
-reduce E -> E + T
+reduce T → id
+reduce E → E + T
 accept
 ```
 
@@ -79,33 +79,33 @@ LR 分析要求每一步归约都是最右推导的逆过程。也就是说，�
 这两个词考试常以英文概念出现，不要求复杂形式化证明。会把它们和状态栈联系起来即可：
 
 - 状态栈记录当前 viable prefix 对应的 LR 自动机状态。
-- 栈顶状态含有完整项 `A -> alpha .` 时，说明栈顶可能正好有一个 handle `alpha`。
+- 栈顶状态含有完整项 `A → α .` 时，说明栈顶可能正好有一个 handle `α`。
 
 ## LR(0) Item
 
 LR item 在产生式右部加一个点，表示识别进度。
 
 ```text
-E -> E . + T
+E → E . + T
 ```
 
 含义：已经识别出 `E`，接下来期待 `+ T`。
 
 ```text
-T -> id .
+T → id .
 ```
 
-含义：已经识别完整个右部，可以考虑按 `T -> id` 归约。
+含义：已经识别完整个右部，可以考虑按 `T → id` 归约。
 
 LR(0) 里的 `0` 是说 item 本身没有 lookahead 信息。它不是说 parser 完全不读输入，而是说“是否归约、按哪条产生式归约”只由当前状态决定。
 
-把一个产生式 `A -> X Y Z` 展开成 item，就是把点放在每个可能位置：
+把一个产生式 `A → X Y Z` 展开成 item，就是把点放在每个可能位置：
 
 ```text
-A -> . X Y Z
-A -> X . Y Z
-A -> X Y . Z
-A -> X Y Z .
+A → . X Y Z
+A → X . Y Z
+A → X Y . Z
+A → X Y Z .
 ```
 
 前三个通常还在“等待更多符号”，最后一个是“右部已经凑齐，可以考虑 reduce”。
@@ -114,8 +114,8 @@ A -> X Y Z .
 
 PPT 先讲 LR(0) NFA，是为了说明 item 像自动机状态：
 
-- 普通边：`A -> . X beta` 读过 `X` 后变成 `A -> X . beta`。
-- epsilon 边：如果点后是非终结符 `B`，就可以不消耗输入地跳到 `B -> . gamma`，表示“接下来要识别一个 B”。
+- 普通边：`A → . X β` 读过 `X` 后变成 `A → X . β`。
+- ε 边：如果点后是非终结符 `B`，就可以不消耗输入地跳到 `B → . γ`，表示“接下来要识别一个 B”。
 
 实际手算通常不画 NFA，而是直接用 `closure` 和 `goto` 构造 DFA。一个 DFA 状态就是一组 LR(0) items，也叫 item set。这个过程和词法分析里的 NFA 子集构造很像，但用途不同：这里的自动机不是识别正则语言，而是记录语法分析栈的识别进度。
 
@@ -126,13 +126,13 @@ PPT 先讲 LR(0) NFA，是为了说明 item 像自动机状态：
 如果项集中有：
 
 ```text
-A -> alpha . B beta
+A → α . B β
 ```
 
 点后面是非终结符 `B`，那么要把 `B` 的所有产生式以点在最前的形式加入：
 
 ```text
-B -> . gamma
+B → . γ
 ```
 
 直觉：既然接下来可能要识别 `B`，就要准备识别 `B` 的所有可能形式。
@@ -142,13 +142,13 @@ B -> . gamma
 `goto(I, X)` 表示在项集 `I` 中让点越过符号 `X` 后，再取 closure。
 
 ```text
-A -> alpha . X beta
+A → α . X β
 ```
 
 读入/识别 `X` 后变成：
 
 ```text
-A -> alpha X . beta
+A → α X . β
 ```
 
 ## 构造 LR(0) 项集族
@@ -156,8 +156,8 @@ A -> alpha X . beta
 算法：
 
 ```text
-augment grammar with S' -> S EOF
-I0 = closure({ S' -> . S EOF })
+augment grammar with S' → S EOF
+I0 = closure({ S' → . S EOF })
 repeat:
   for each item set I:
     for each grammar symbol X:
@@ -171,18 +171,18 @@ repeat:
 注意 `$`/`EOF` 的处理边界。课件和虎书常写增广文法：
 
 ```text
-S' -> S EOF
+S' → S EOF
 ```
 
-构造 DFA 时看到 `S' -> S . EOF`，可以有一条 EOF 的 shift 边进入 `S' -> S EOF .`；也有教材写法把 `S' -> S . $` 所在状态直接在 `$` 上填 accept。考试时按题目给的增广形式来，但核心一致：只有增广开始产生式完整并遇到 EOF 时才 accept。
+构造 DFA 时看到 `S' → S . EOF`，可以有一条 EOF 的 shift 边进入 `S' → S EOF .`；也有教材写法把 `S' → S . $` 所在状态直接在 `$` 上填 accept。考试时按题目给的增广形式来，但核心一致：只有增广开始产生式完整并遇到 EOF 时才 accept。
 
 ## LR 手算标准流程
 
 LR 题最容易因为漏项而错。建议按这个表格流程写：
 
 ```text
-1. 增广文法：S' -> S EOF
-2. 写 I0 = closure(S' -> . S EOF)
+1. 增广文法：S' → S EOF
+2. 写 I0 = closure(S' → . S EOF)
 3. 对 I0 中点后面的每个符号 X 计算 goto(I0, X)
 4. 新得到的项集编号为 I1, I2, ...
 5. 对每个新项集重复第 3 步
@@ -195,15 +195,15 @@ LR 题最容易因为漏项而错。建议按这个表格流程写：
 手算 `closure` 时只看“点后面”的符号：
 
 ```text
-A -> alpha . B beta
+A → α . B β
 ```
 
-只有点后是非终结符 `B`，才加入 `B -> . gamma`。如果点后是终结符或点在末尾，不展开。
+只有点后是非终结符 `B`，才加入 `B → . γ`。如果点后是终结符或点在末尾，不展开。
 
 手算 `goto(I, X)` 时分两步：
 
 ```text
-先移动点：A -> alpha . X beta 变成 A -> alpha X . beta
+先移动点：A → α . X β 变成 A → α X . β
 再对移动后的项集做 closure
 ```
 
@@ -224,19 +224,19 @@ ACTION[i,a] = shift j
 如果状态 `i` 有完整项：
 
 ```text
-A -> alpha .
+A → α .
 ```
 
 则 LR(0) 会在所有终结符上填：
 
 ```text
-ACTION[i,a] = reduce A -> alpha
+ACTION[i,a] = reduce A → α
 ```
 
 如果是：
 
 ```text
-S' -> S . EOF
+S' → S . EOF
 ```
 
 则读到 EOF 后 accept。
@@ -252,7 +252,7 @@ GOTO[i,A] = j
 
 1. 先填所有终结符边：`ACTION[i,a] = shift j`。
 2. 再填所有非终结符边：`GOTO[i,A] = j`。
-3. 再看每个完整项 `A -> alpha .`，按 LR(0) 或 SLR 规则填 reduce。
+3. 再看每个完整项 `A → α .`，按 LR(0) 或 SLR 规则填 reduce。
 4. 最后处理增广开始产生式的 accept。
 5. 如果同一格出现两个动作，就是冲突。
 
@@ -263,7 +263,7 @@ GOTO[i,A] = j
 状态栈初始为 `0`。动作：
 
 - `shift j`：读入当前 token，把 token 和状态 `j` 入栈。
-- `reduce A -> beta`：弹出 `|beta|` 个语法符号及其状态，再根据当前栈顶状态 `s` 查 `GOTO[s,A]` 入栈。
+- `reduce A → β`：弹出 `|β|` 个语法符号及其状态，再根据当前栈顶状态 `s` 查 `GOTO[s,A]` 入栈。
 - `accept`：成功。
 - `error`：语法错误。
 
@@ -275,7 +275,7 @@ GOTO[i,A] = j
 
 每次 reduce 后要特别小心：先弹出右部长度对应的状态，再用“弹出后的栈顶状态”和产生式左部查 `GOTO`。很多错误都出在 reduce 后还用旧栈顶。
 
-如果产生式右部是 `epsilon`，reduce 时弹出 0 个状态，然后直接用当前栈顶状态查 `GOTO[s,A]`。这类题不一定出现，但这个规则能统一所有 reduce。
+如果产生式右部是 `ε`，reduce 时弹出 0 个状态，然后直接用当前栈顶状态查 `GOTO[s,A]`。这类题不一定出现，但这个规则能统一所有 reduce。
 
 ## SLR(1)
 
@@ -284,13 +284,13 @@ LR(0) 的问题是归约太粗：只要状态里有完整项，就对所有 look
 如果状态 `i` 有：
 
 ```text
-A -> alpha .
+A → α .
 ```
 
-只在 `a in FOLLOW(A)` 时填：
+只在 `a ∈ FOLLOW(A)` 时填：
 
 ```text
-ACTION[i,a] = reduce A -> alpha
+ACTION[i,a] = reduce A → α
 ```
 
 SLR 仍使用 LR(0) 项集 DFA，只在填表时使用 FOLLOW 集限制归约。
@@ -314,61 +314,61 @@ SLR 仍使用 LR(0) 项集 DFA，只在填表时使用 FOLLOW 集限制归约。
 
 LR(0) 冲突不一定说明语言有问题，可能只是 LR(0) 信息不够。SLR、LR(1)、LALR 会逐步增加精度。
 
-SLR 能处理一部分 LR(0) 冲突，但 FOLLOW 是全局近似，所以仍可能误判。例如某个状态里 `A -> alpha .` 只应在特定上下文归约，但 `FOLLOW(A)` 包含了更宽泛的 token，于是仍会和 shift 或另一个 reduce 撞在同一格。第 06 章的 LR(1) 会把 lookahead 写进 item，用更局部的信息解决一部分 SLR 冲突。
+SLR 能处理一部分 LR(0) 冲突，但 FOLLOW 是全局近似，所以仍可能误判。例如某个状态里 `A → α .` 只应在特定上下文归约，但 `FOLLOW(A)` 包含了更宽泛的 token，于是仍会和 shift 或另一个 reduce 撞在同一格。第 06 章的 LR(1) 会把 lookahead 写进 item，用更局部的信息解决一部分 SLR 冲突。
 
 ## 例题：完整 LR(0) 项集族与表
 
 文法：
 
 ```text
-0. S' -> S EOF
-1. S  -> E
-2. E  -> E + T
-3. E  -> T
-4. T  -> id
+0. S' → S EOF
+1. S  → E
+2. E  → E + T
+3. E  → T
+4. T  → id
 ```
 
 ### 项集族
 
-`I0 = closure(S' -> . S EOF)`：
+`I0 = closure(S' → . S EOF)`：
 
 ```text
-S' -> . S EOF
-S  -> . E
-E  -> . E + T
-E  -> . T
-T  -> . id
+S' → . S EOF
+S  → . E
+E  → . E + T
+E  → . T
+T  → . id
 ```
 
 从 `I0` 出发：
 
 ```text
 goto(I0, S) = I1:
-S' -> S . EOF
+S' → S . EOF
 
 goto(I0, E) = I2:
-S  -> E .
-E  -> E . + T
+S  → E .
+E  → E . + T
 
 goto(I0, T) = I3:
-E  -> T .
+E  → T .
 
 goto(I0, id) = I4:
-T  -> id .
+T  → id .
 ```
 
 继续：
 
 ```text
 goto(I1, EOF) = I5:
-S' -> S EOF .
+S' → S EOF .
 
 goto(I2, +) = I6:
-E -> E + . T
-T -> . id
+E → E + . T
+T → . id
 
 goto(I6, T) = I7:
-E -> E + T .
+E → E + T .
 
 goto(I6, id) = I4
 ```
@@ -409,7 +409,7 @@ FOLLOW(T) = { +, EOF }
 | I6 | s4 |  |  |  |  | I7 |
 | I7 |  | r2 `E->E+T` | r2 `E->E+T` |  |  |  |
 
-`I2` 同时有完整项 `S -> E .` 和 shift 边 `+`。如果用 LR(0)，`S -> E` 会在所有终结符上归约，于是 `+` 格子出现 shift/reduce conflict；SLR 用 `FOLLOW(S)={EOF}` 限制 `S->E` 只在 EOF 上归约，因此消除这个冲突。
+`I2` 同时有完整项 `S → E .` 和 shift 边 `+`。如果用 LR(0)，`S → E` 会在所有终结符上归约，于是 `+` 格子出现 shift/reduce conflict；SLR 用 `FOLLOW(S)={EOF}` 限制 `S->E` 只在 EOF 上归约，因此消除这个冲突。
 
 ### 状态栈分析 `id + id EOF`
 
@@ -459,9 +459,9 @@ FOLLOW(T) = { +, EOF }
 1. 对文法构造 LR(0) 项集族：
 
 ```text
-S -> E
-E -> E + T | T
-T -> id
+S → E
+E → E + T | T
+T → id
 ```
 
 2. 根据项集族填写 ACTION/GOTO 表。
@@ -491,7 +491,7 @@ T -> id
 | shift/reduce conflict | 移进/归约冲突 | 同格两种动作 |
 | reduce/reduce conflict | 归约/归约冲突 | 同格多个归约 |
 | SLR parsing | SLR 分析 | FOLLOW 限制 LR(0) 归约 |
-| augmented grammar | 增广文法 | 加 `S' -> S EOF` |
+| augmented grammar | 增广文法 | 加 `S' → S EOF` |
 | handle | 句柄 | 下一步应归约的右部实例 |
 | viable prefix | 可行前缀 | 可能出现在 LR 栈上的前缀 |
 | LR automaton | LR 自动机 | 项集 DFA |

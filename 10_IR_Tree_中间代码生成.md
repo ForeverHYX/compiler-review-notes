@@ -26,7 +26,7 @@ PPT 先讲 IR 的意义，再讲 Tiger 采用的 IR Tree，最后讲 AST 到 IR 
 如果每种源语言直接翻译到每种目标机器，需要 `N*M` 个翻译器。用 IR 后：
 
 ```text
-N 个前端 -> IR -> M 个后端
+N 个前端 → IR → M 个后端
 ```
 
 复杂度接近 `N+M`。
@@ -59,7 +59,7 @@ Tiger 课上真正展开的是 IR Tree，不是让你用三地址码做完整翻
 Tiger compiler 使用一种低层 tree representation。它在 AST 和 assembly 之间：
 
 ```text
-AST -> IR Tree -> assembly -> machine code
+AST → IR Tree → assembly → machine code
 ```
 
 表达式节点：
@@ -154,12 +154,12 @@ if a < b goto trueLabel else falseLabel
 
 | 从 | 到 | 思路 |
 |---|---|---|
-| `Ex` -> `Nx` | `EXP(e)` | 只保留副作用，丢弃值 |
-| `Cx` -> `Nx` | 生成 true/false label | 条件只用于控制流 |
-| `Cx` -> `Ex` | 生成临时变量 `r` | true 分支令 `r=1`，false 分支令 `r=0` |
-| `Nx` -> `Ex` | 通常不自然 | 没有值，除非人为返回 0 |
+| `Ex` → `Nx` | `EXP(e)` | 只保留副作用，丢弃值 |
+| `Cx` → `Nx` | 生成 true/false label | 条件只用于控制流 |
+| `Cx` → `Ex` | 生成临时变量 `r` | true 分支令 `r=1`，false 分支令 `r=0` |
+| `Nx` → `Ex` | 通常不自然 | 没有值，除非人为返回 0 |
 
-`Cx -> Ex` 的典型模板：
+`Cx → Ex` 的典型模板：
 
 ```text
 r := 1
@@ -172,7 +172,7 @@ TEMP r
 
 真实实现会更小心地放置 join label，但核心是“用控制流给临时变量赋真假值”。
 
-`Nx -> Ex` 在虎书 `unEx` 中也可以人为翻成：
+`Nx → Ex` 在虎书 `unEx` 中也可以人为翻成：
 
 ```text
 ESEQ(nx_statement, CONST 0)
@@ -180,7 +180,7 @@ ESEQ(nx_statement, CONST 0)
 
 这只表示“先执行副作用，再给一个无意义的 0”。不要把它理解为源程序真的返回 0。
 
-`Ex -> Cx` 常见模板是把非 0 当真：
+`Ex → Cx` 常见模板是把非 0 当真：
 
 ```text
 CJUMP(NE, unEx(e), CONST 0, trueLabel, falseLabel)
@@ -304,8 +304,8 @@ Tiger 没有 C/Pascal 那种 structured l-value。Tiger 的 array/record 变量�
 算术二元运算通常直接对应 `BINOP`：
 
 ```text
-a + b  -> BINOP(PLUS, unEx(a), unEx(b))
-a - b  -> BINOP(MINUS, unEx(a), unEx(b))
+a + b  → BINOP(PLUS, unEx(a), unEx(b))
+a - b  → BINOP(MINUS, unEx(a), unEx(b))
 ```
 
 Tree IR 没有专门的一元负号。Tiger 的 `-x` 可翻译成：
@@ -317,7 +317,7 @@ BINOP(MINUS, CONST 0, unEx(x))
 比较表达式通常是 `Cx`：
 
 ```text
-a < b -> Cx(CJUMP(LT, unEx(a), unEx(b), true?, false?))
+a < b → Cx(CJUMP(LT, unEx(a), unEx(b), true?, false?))
 ```
 
 字符串相等不是简单 `EQ` 指针比较，而应调用 runtime 函数，例如 `stringEqual(a,b)`，因为需要逐字符比较内容。
@@ -429,7 +429,7 @@ externalCall("initArray", [size, init])
 数组访问：
 
 ```text
-a[i] -> MEM(BINOP(PLUS,
+a[i] → MEM(BINOP(PLUS,
                   array_pointer,
                   BINOP(MUL, index, CONST wordSize)))
 ```
@@ -442,7 +442,7 @@ a[i] -> MEM(BINOP(PLUS,
 
 ```text
 StringFrag(label=L_str0, value="hello")
-StringExp("hello") -> NAME(L_str0)
+StringExp("hello") → NAME(L_str0)
 ```
 
 虎书中的 Tiger 字符串表示可理解为：指针指向一段内存，开头一个 word 存长度，后面存字符数据。考试通常只要知道字符串字面量会变成带 label 的 data fragment，字符串操作调用 runtime。
@@ -611,7 +611,7 @@ MEM(base(a) + i * 4)
 | array/record pointer model | L-value 与 R-value、Record/Array/String 翻译 | 知道赋值复制指针 |
 | subscripting/field selection | 例题：数组访问、Record/Array/String 翻译 | 能写 `base + index*W` 和字段 offset |
 | conditionals/short-circuit | 短路求值、控制结构翻译 | 能用 `CJUMP/LABEL/JUMP` 翻译 |
-| while/for/break | 控制结构翻译 | 能画 `test/body/done` 和 `break -> done` |
+| while/for/break | 控制结构翻译 | 能画 `test/body/done` 和 `break → done` |
 | function call static link | Tiger AST 到 Tree IR 翻译规则总表 | 能把 hidden static link 放入参数列表 |
 | variable/type/function declarations | Declaration 翻译 | 能说 var 初始化、type no-op、function ProcFrag |
 | fragments/external calls | Fragment、External Call | 能区分 `StringFrag`、`ProcFrag`、runtime call |

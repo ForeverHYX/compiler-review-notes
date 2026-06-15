@@ -24,14 +24,14 @@ IF LPAREN ID(i) EQ ID(j) RPAREN ID(print) LPAREN STRING("equal") RPAREN SEMI
 你可以把 lexer 想成一个带状态的扫描器：
 
 ```text
-当前状态 + 当前字符 -> 下一个状态
+当前状态 + 当前字符 → 下一个状态
 ```
 
 如果走到某个接受状态，就说明刚读过的一段字符可以形成一个 token。真正的 lexer 还要记住“目前见过的最长合法 token”，因为输入 `if8` 时应该得到一个 `ID(if8)`，而不是 `IF` 后面跟 `NUM(8)`。
 
 ## 本章考试能力清单
 
-- 概念题：能解释 token、lexeme、pattern、RE、NFA、DFA、epsilon-closure、longest match。
+- 概念题：能解释 token、lexeme、pattern、RE、NFA、DFA、ε-closure、longest match。
 - 手算题：能把 RE 画成 NFA，能用子集构造列 DFA 状态表，能按划分法最小化 DFA。
 - 工具题：能判断 Lex/Flex 中最长匹配和规则优先级的结果。
 - 英文题：看到 `Thompson construction`、`subset construction`、`transition function`、`accepting state` 能知道要写什么。
@@ -164,7 +164,7 @@ if (count == 10) count = count + 1;
 
 - 字母表：符号的有限集合。
 - 串：符号的有限序列。
-- 空串：长度为 0 的串，记作 `epsilon`。
+- 空串：长度为 0 的串，记作 `ε`。
 - 语言：某个字母表上的串集合。
 
 形式语言的目的不是把概念变抽象，而是让“哪些字符串合法”可以被精确描述。
@@ -178,19 +178,19 @@ if (count == 10) count = count + 1;
 那么：
 
 - `a`、`ab`、`bba` 都是 Σ 上的串。
-- `epsilon` 也是 Σ 上的串，因为空串不包含非法符号。
+- `ε` 也是 Σ 上的串，因为空串不包含非法符号。
 - `{a, ab, bba}` 是一个有限语言。
 - `{ 所有由 a 和 b 组成且以 abb 结尾的串 }` 是一个无限语言。
 
-考试里 `epsilon` 和空集经常混淆：
+考试里 `ε` 和空集经常混淆：
 
 | 写法 | 含义 |
 |---|---|
-| `epsilon` | 空串，是一个长度为 0 的字符串 |
-| `{epsilon}` | 只包含空串的语言 |
-| `empty set` 或 `∅` | 空语言，不包含任何字符串 |
+| `ε` | 空串，是一个长度为 0 的字符串 |
+| `{ε}` | 只包含空串的语言 |
+| `∅` | 空语言，不包含任何字符串 |
 
-所以 `epsilon in L` 与 `L = empty set` 完全不是一回事。
+所以 `ε ∈ L` 与 `L = ∅` 完全不是一回事。
 
 常用语言运算：
 
@@ -220,17 +220,17 @@ int    = digit+
 | 构造 | 语言含义 | 例子 |
 |---|---|---|
 | `a` | 只包含一个字符 `a` 的语言 | `L(a) = {"a"}` |
-| `epsilon` | 只包含空串的语言 | `L(epsilon) = {epsilon}` |
+| `ε` | 只包含空串的语言 | `L(ε) = {ε}` |
 | `r | s` | 并集 | `a|b` 匹配 `"a"` 或 `"b"` |
 | `rs` | 连接 | `ab` 匹配 `"ab"` |
-| `r*` | Kleene 闭包，重复 0 次或多次 | `a*` 匹配 `epsilon`、`a`、`aa` |
+| `r*` | Kleene 闭包，重复 0 次或多次 | `a*` 匹配 `ε`、`a`、`aa` |
 
 常见缩写不增加表达能力，只是写起来方便：
 
 | 缩写 | 等价写法 |
 |---|---|
 | `r+` | `r r*` |
-| `r?` | `r | epsilon` |
+| `r?` | `r | ε` |
 | `[0-9]` | `0|1|2|...|9` |
 | `[^"\n]` | 除双引号和换行外的任意字符 |
 
@@ -248,9 +248,9 @@ a|bc*     等价于 a | (b (c*))
 课件里会写：
 
 ```text
-digit   -> 0|1|...|9
-letter_ -> A|...|Z|a|...|z|_
-id      -> letter_ (letter_ | digit)*
+digit   → 0|1|...|9
+letter_ → A|...|Z|a|...|z|_
+id      → letter_ (letter_ | digit)*
 ```
 
 这里的 `digit`、`letter_` 只是给 RE 片段起名字，方便后面复用。它不是运行时变量，也不会在扫描时“先识别 digit 再识别 id”。真正生成 lexer 时，工具会把这些定义展开成一个整体自动机。
@@ -294,42 +294,40 @@ flowchart LR
 
 ```text
 每条 token 规则的 RE
-  -> 合并成一个大 RE 或多个 NFA
-  -> Thompson 构造得到 NFA
-  -> 子集构造得到 DFA
-  -> 可选：DFA 最小化
-  -> 生成转移表和动作代码
+  → 合并成一个大 RE 或多个 NFA
+  → Thompson 构造得到 NFA
+  → 子集构造得到 DFA
+  → 可选：DFA 最小化
+  → 生成转移表和动作代码
 ```
 
 ## NFA：非确定有穷自动机
 
 NFA 的全称是 `nondeterministic finite automaton`。形式上可写成：
 
-```text
-M = (S, Σ, move, s0, F)
-```
+$$M = (S, \Sigma, move, s_0, F)$$
 
 | 组成 | 含义 |
 |---|---|
 | `S` | 有穷状态集合 |
-| `Σ` | 输入字母表，不包含 `epsilon` |
-| `move` | 转移函数，`S x (Σ union {epsilon}) -> P(S)` |
-| `s0` | 开始状态，`s0 in S` |
-| `F` | 接受状态集合，`F subset S` |
+| $\Sigma$ | 输入字母表，不包含 $\epsilon$ |
+| `move` | 转移函数，$S \times (\Sigma \cup \{\epsilon\}) \to \mathcal{P}(S)$ |
+| $s_0$ | 开始状态，$s_0 \in S$ |
+| `F` | 接受状态集合，$F \subseteq S$ |
 
-`P(S)` 表示 `S` 的幂集，也就是“状态集合的集合”。这句话很重要：NFA 从一个状态读一个字符后，可能到达多个状态，也可能一个都到不了。
+$\mathcal{P}(S)$ 表示 `S` 的幂集，也就是“状态集合的集合”。这句话很重要：NFA 从一个状态读一个字符后，可能到达多个状态，也可能一个都到不了。
 
 NFA 的“非确定”体现在两点：
 
 1. 同一个状态上，同一个输入字符可以有多条边。
-2. 可以有 `epsilon` 边，不消耗输入字符就移动。
+2. 可以有 `ε` 边，不消耗输入字符就移动。
 
 例如：
 
 ```text
 state 0 --a--> state 1
 state 0 --a--> state 2
-state 0 --epsilon--> state 3
+state 0 --ε--> state 3
 ```
 
 如果当前在 `state 0` 且下一个输入是 `a`，NFA 可以进入 `state 1` 或 `state 2`；即使不读字符，也可以先进 `state 3`。
@@ -342,33 +340,29 @@ NFA 接受一个字符串，不是说“所有路径都成功”，而是说“�
 
 ```text
 从 s0 出发
-允许先走任意条 epsilon 边
+允许先走任意条 ε 边
 读 a，可能进入一组状态
-再走任意条 epsilon 边
+再走任意条 ε 边
 读 b，可能进入一组状态
-再走任意条 epsilon 边
+再走任意条 ε 边
 读 c，可能进入一组状态
-再走任意条 epsilon 边
+再走任意条 ε 边
 如果这组状态里至少有一个接受状态，就接受
 ```
 
-这就是为什么 NFA 很适合从 RE 构造：它可以把“选择”“重复”“可跳过”直接画成分支和 epsilon 边。但直接模拟 NFA 通常不如 DFA 高效，因为你要同时跟踪很多可能路径。
+这就是为什么 NFA 很适合从 RE 构造：它可以把“选择”“重复”“可跳过”直接画成分支和 ε 边。但直接模拟 NFA 通常不如 DFA 高效，因为你要同时跟踪很多可能路径。
 
 ## DFA：确定有穷自动机
 
 DFA 的全称是 `deterministic finite automaton`。形式也写成：
 
-```text
-M = (S, Σ, move, s0, F)
-```
+$$M = (S, \Sigma, move, s_0, F)$$
 
 但 DFA 的转移函数不同：
 
-```text
-move: S x Σ -> S
-```
+$$move: S \times \Sigma \to S$$
 
-也就是说，在某个状态读某个字符，下一个状态唯一确定，并且不允许 `epsilon` 边。
+也就是说，在某个状态读某个字符，下一个状态唯一确定，并且不允许 `ε` 边。
 
 DFA 接受字符串的过程非常机械：
 
@@ -396,8 +390,8 @@ next_state = table[current_state][current_char]
 
 ```text
 输入: abba
-DFA 读完整个串后如果停在终态 -> 接受
-否则 -> 拒绝
+DFA 读完整个串后如果停在终态 → 接受
+否则 → 拒绝
 ```
 
 lexer 前缀识别：
@@ -439,7 +433,7 @@ else:
 | 对比点 | NFA | DFA |
 |---|---|---|
 | 同状态同字符后继 | 可以多个 | 唯一 |
-| `epsilon` 边 | 可以有 | 没有 |
+| `ε` 边 | 可以有 | 没有 |
 | 执行时是否要跟踪多条路径 | 是 | 否 |
 | 从 RE 构造 | 容易 | 可由 NFA 转换 |
 | 识别能力 | 正则语言 | 正则语言 |
@@ -453,7 +447,7 @@ else:
 
 不必死记每张图，记住三个组合：
 
-- 并：新起点 epsilon 到两个分支，两个分支再 epsilon 到新终点。
+- 并：新起点 ε 到两个分支，两个分支再 ε 到新终点。
 - 连接：前一个 NFA 的终点接到后一个 NFA 的起点。
 - 闭包：允许跳过、重复、退出。
 
@@ -461,10 +455,10 @@ Thompson 构造的原则是：每个正则表达式片段都生成一个“单�
 
 ### 基本构造
 
-识别 `epsilon`：
+识别 `ε`：
 
 ```text
-start --epsilon--> final
+start --ε--> final
 ```
 
 识别字符 `a`：
@@ -476,11 +470,11 @@ start --a--> final
 ### 并 `s | t`
 
 ```text
-          epsilon      N(s)      epsilon
+          ε      N(s)      ε
        /----------> [s ...] ---------------\
 start                                      final
        \----------> [t ...] ---------------/
-          epsilon      N(t)      epsilon
+          ε      N(t)      ε
 ```
 
 意思是：不读输入先选择走 `s` 分支或 `t` 分支。
@@ -488,7 +482,7 @@ start                                      final
 ### 连接 `st`
 
 ```text
-start -> N(s) -> N(t) -> final
+start → N(s) → N(t) → final
 ```
 
 意思是：先识别 `s`，再识别 `t`。
@@ -496,19 +490,19 @@ start -> N(s) -> N(t) -> final
 ### 闭包 `s*`
 
 ```text
-                 epsilon
+                 ε
           /---------------------\
           v                     |
-start --epsilon--> N(s) --epsilon--> final
+start --ε--> N(s) --ε--> final
   |                         ^
-  \-------epsilon-----------/
+  \-------ε-----------/
 ```
 
 要能表达三件事：
 
-- 重复 0 次：从 start 直接 epsilon 到 final。
+- 重复 0 次：从 start 直接 ε 到 final。
 - 重复 1 次：走一遍 `N(s)` 后到 final。
-- 重复多次：走完 `N(s)` 后 epsilon 回到 `N(s)` 开头。
+- 重复多次：走完 `N(s)` 后 ε 回到 `N(s)` 开头。
 
 ### 小例：`ab*`
 
@@ -530,7 +524,7 @@ abbb
 不接受：
 
 ```text
-epsilon
+ε
 b
 ba
 ```
@@ -548,14 +542,14 @@ NFA 同时可能在多个状态里
 DFA 用一个“状态集合”一次性代表这些可能性
 ```
 
-如果 NFA 在读完某个前缀后可能位于 `{1, 3, 5}`，那么 DFA 就创建一个状态，名字可以叫 `A = {1,3,5}`。之后 DFA 从 `A` 读字符 `a`，就等价于 NFA 从 `{1,3,5}` 中任意状态读 `a` 后能到达的所有状态，再加上 epsilon 闭包。
+如果 NFA 在读完某个前缀后可能位于 `{1, 3, 5}`，那么 DFA 就创建一个状态，名字可以叫 `A = {1,3,5}`。之后 DFA 从 `A` 读字符 `a`，就等价于 NFA 从 `{1,3,5}` 中任意状态读 `a` 后能到达的所有状态，再加上 ε 闭包。
 
 ### 两个基本操作
 
-`epsilon-closure(T)`：
+`ε-closure(T)`：
 
 ```text
-从状态集合 T 出发，只沿 epsilon 边能到达的所有状态，加上 T 自身
+从状态集合 T 出发，只沿 ε 边能到达的所有状态，加上 T 自身
 ```
 
 `move(T, a)`：
@@ -567,20 +561,20 @@ DFA 用一个“状态集合”一次性代表这些可能性
 注意顺序：
 
 ```text
-读字符前，当前 DFA 状态已经是 epsilon-closed 的集合
+读字符前，当前 DFA 状态已经是 ε-closed 的集合
 读字符 a：先 move(T, a)
-读完字符后：再 epsilon-closure(...)
+读完字符后：再 ε-closure(...)
 ```
 
 算法模板：
 
 ```text
-start = epsilon-closure({nfa_start})
+start = ε-closure({nfa_start})
 worklist = [start]
 while worklist not empty:
     T = pop(worklist)
     for each input symbol a:
-        U = epsilon-closure(move(T, a))
+        U = ε-closure(move(T, a))
         add transition T --a--> U
         if U is new:
             add U to worklist
@@ -603,8 +597,8 @@ while worklist not empty:
 假设 NFA：
 
 ```text
-0 --epsilon--> 1
-0 --epsilon--> 3
+0 --ε--> 1
+0 --ε--> 3
 1 --a--> 2
 3 --b--> 4
 2,4 是终态
@@ -615,7 +609,7 @@ while worklist not empty:
 第一步：
 
 ```text
-epsilon-closure({0}) = {0,1,3}
+ε-closure({0}) = {0,1,3}
 ```
 
 所以 DFA 初态：
@@ -628,7 +622,7 @@ A = {0,1,3}
 
 ```text
 move({0,1,3}, a) = {2}
-epsilon-closure({2}) = {2}
+ε-closure({2}) = {2}
 ```
 
 得到：
@@ -641,7 +635,7 @@ B = {2}
 
 ```text
 move({0,1,3}, b) = {4}
-epsilon-closure({4}) = {4}
+ε-closure({4}) = {4}
 ```
 
 得到：
@@ -681,7 +675,7 @@ C = {4}
 
 最直接的可区分情况：
 
-- 一个是终态，一个不是终态。用 `epsilon` 就能区分。
+- 一个是终态，一个不是终态。用 `ε` 就能区分。
 
 间接的可区分情况：
 
@@ -826,7 +820,7 @@ Lex/Flex 把这件事自动化：
 
 ```text
 你写: token 的正则规则 + 动作代码
-工具做: RE -> NFA -> DFA -> 转移表
+工具做: RE → NFA → DFA → 转移表
 运行时: 用转移表扫描，匹配后执行动作代码
 ```
 
@@ -905,10 +899,10 @@ line, column, offending character
 规则：
 
 ```text
-"if"      -> IF
-[a-z]+    -> ID
-"=="      -> EQ
-"="       -> ASSIGN
+"if"      → IF
+[a-z]+    → ID
+"=="      → EQ
+"="       → ASSIGN
 ```
 
 输入：
@@ -990,12 +984,12 @@ baa
 ## 常见误区
 
 - 把“DFA 接受整个串”和“lexer 切下一个 token”混为一谈。前者读完整个测试串，后者只切当前位置的最长合法前缀。
-- `epsilon` 不是空集。空串是一个串，空集是不含任何串的集合。
+- `ε` 不是空集。空串是一个串，空集是不含任何串的集合。
 - NFA 的“非确定”不是随机，而是定义上允许多个选择。
 - NFA 接受是“存在一条成功路径”，不是“所有路径都成功”。
 - DFA 状态在子集构造后是“NFA 状态集合”，不是把 NFA 状态简单改名。
-- 子集构造里的 `closure` 必须包括 epsilon 可达状态。
-- `move` 和 `epsilon-closure` 顺序不能反：读字符用 `move`，读完后再补 epsilon 闭包。
+- 子集构造里的 `closure` 必须包括 ε 可达状态。
+- `move` 和 `ε-closure` 顺序不能反：读字符用 `move`，读完后再补 ε 闭包。
 - DFA 最小化不能只看当前是否终态，还要看未来所有输入行为。
 - Lex 不是先匹配第一条规则，而是先最长匹配。
 - 关键字规则放在 ID 前面只解决“同长度”冲突，不能覆盖最长匹配。
@@ -1029,7 +1023,7 @@ baa
 3. 给定输入 `elsewhere else = ==`，说明关键字和 ID 的匹配结果。
 4. 对一个 5 状态 DFA 进行最小化：先分终态/非终态，再按输入拆分。
 5. 解释 NFA 和 DFA 的五元组分别是什么，并指出二者转移函数的区别。
-6. 给一个包含 epsilon 边的小 NFA，手算 `epsilon-closure({s0})` 和 `epsilon-closure(move(T,a))`。
+6. 给一个包含 ε 边的小 NFA，手算 `ε-closure({s0})` 和 `ε-closure(move(T,a))`。
 
 ## 练习参考答案
 
@@ -1039,27 +1033,27 @@ baa
 
 | English | 中文 | 考试提示 |
 |---|---|---|
-| lexical analysis | 词法分析 | character stream -> token stream |
+| lexical analysis | 词法分析 | character stream → token stream |
 | token | 词法记号 | 类别，如 `ID` |
 | lexeme | 词素 | 实际字符串，如 `count` |
 | pattern | 模式 | 描述 lexeme 集合 |
 | alphabet | 字母表 | 符号集合 |
 | string | 串 | 符号序列 |
-| empty string, epsilon | 空串 | 长度为 0 |
+| empty string, ε | 空串 | 长度为 0 |
 | regular expression, RE | 正则表达式 | 描述正则语言 |
 | alternation | 并/选择 | `r|s` |
 | concatenation | 连接 | `rs` |
 | Kleene closure | Kleene 闭包 | `r*` |
 | finite automaton, FA | 有穷自动机 | 识别正则语言 |
-| nondeterministic finite automaton, NFA | 非确定有穷自动机 | 可有 epsilon 边/多个后继 |
+| nondeterministic finite automaton, NFA | 非确定有穷自动机 | 可有 ε 边/多个后继 |
 | deterministic finite automaton, DFA | 确定有穷自动机 | 每状态每输入唯一后继 |
 | start state | 开始状态 | 自动机入口 |
 | final state, accepting state | 终态/接受状态 | 读完整串后在此则接受 |
-| transition function | 转移函数 | `move` 或 `delta` |
-| Thompson construction | Thompson 构造 | RE -> NFA |
-| epsilon-closure | epsilon 闭包 | 只走 epsilon 能到达的状态集合 |
+| transition function | 转移函数 | `move` 或 `δ` |
+| Thompson construction | Thompson 构造 | RE → NFA |
+| ε-closure | ε 闭包 | 只走 ε 能到达的状态集合 |
 | move function | move 操作 | 读一个字符后能到达的状态 |
-| subset construction | 子集构造法 | NFA -> DFA |
+| subset construction | 子集构造法 | NFA → DFA |
 | DFA minimization | DFA 最小化 | 合并等价状态 |
 | distinguishable states | 可区分状态 | 某个后缀能区分接受/拒绝 |
 | table-driven lexer | 表驱动词法分析器 | 用状态转移表扫描 |

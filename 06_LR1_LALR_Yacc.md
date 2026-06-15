@@ -7,7 +7,7 @@ SLR 用 FOLLOW 集限制归约，但 FOLLOW 是全局近似。有些时候，`A`
 ## 本章考试能力清单
 
 - 概念题：能比较 LR(0)、SLR、LR(1)、LALR 的 reduce 条件和精度。
-- 手算题：能计算 LR(1) closure 中的 `FIRST(beta a)`，能写 goto 后的 LR(1) items。
+- 手算题：能计算 LR(1) closure 中的 `FIRST(β a)`，能写 goto 后的 LR(1) items。
 - 冲突题：能解释 LALR 合并 same core 后为什么可能产生 reduce/reduce conflict。
 - 工具题：能读懂 Yacc/Bison 的 `%token`、`%union`、`%type`、`%left`、`$1`、`$$`。
 
@@ -28,89 +28,89 @@ SLR 用 FOLLOW 集限制归约，但 FOLLOW 是全局近似。有些时候，`A`
 SLR 的 reduce 条件是：
 
 ```text
-A -> alpha .
-lookahead in FOLLOW(A)
+A → α .
+lookahead ∈ FOLLOW(A)
 ```
 
 问题在于 FOLLOW(A) 是全局集合，只说明某些句型中 `A` 后面可能出现这些 token；但在某个具体 LR 状态里，当前栈前缀不一定允许所有 FOLLOW token。
 
-PPT 的直觉是：LR 分析应当是最右推导的逆过程。即使 `x in FOLLOW(A)`，如果当前栈前缀接上 `A x` 并不是任何合法最右句型前缀，就不该按 `A -> alpha` 归约。LR(1) 的做法就是把“当前具体上下文中允许哪些 lookahead”直接写进 item。
+PPT 的直觉是：LR 分析应当是最右推导的逆过程。即使 `x ∈ FOLLOW(A)`，如果当前栈前缀接上 `A x` 并不是任何合法最右句型前缀，就不该按 `A → α` 归约。LR(1) 的做法就是把“当前具体上下文中允许哪些 lookahead”直接写进 item。
 
 ## LR(1) Item
 
 LR(1) item 形如：
 
 ```text
-[A -> alpha . beta, a]
+[A → α . β, a]
 ```
 
-含义：正在识别 `A -> alpha beta`，点表示进度；如果最终完成并且下一个输入是 `a`，才允许归约。
+含义：正在识别 `A → α β`，点表示进度；如果最终完成并且下一个输入是 `a`，才允许归约。
 
 完整项：
 
 ```text
-[A -> alpha ., a]
+[A → α ., a]
 ```
 
 只在 `lookahead == a` 时归约。
 
-更完整地说，`[A -> alpha . beta, a]` 表示：
+更完整地说，`[A → α . β, a]` 表示：
 
-- 栈顶已经识别出 `alpha`。
-- 接下来希望识别出能由 `beta a` 开头的输入。
+- 栈顶已经识别出 `α`。
+- 接下来希望识别出能由 `β a` 开头的输入。
 - `a` 只在 item 完成时控制 reduce，不要求 shift 时当前输入一定是 `a`。
 
 起始项常写成：
 
 ```text
-[S' -> . S EOF, ?]
+[S' → . S EOF, ?]
 ```
 
-这里 `?` 是任意占位符，因为真正的 EOF 已经在右部里，最后不会再移进 `?`。有些写法直接用 `[S' -> . S, EOF]`，按题目给的增广文法保持一致即可。
+这里 `?` 是任意占位符，因为真正的 EOF 已经在右部里，最后不会再移进 `?`。有些写法直接用 `[S' → . S, EOF]`，按题目给的增广文法保持一致即可。
 
 ## LR(1) Closure
 
 如果项集中有：
 
 ```text
-[A -> alpha . B beta, a]
+[A → α . B β, a]
 ```
 
-则对 `B -> gamma` 加入：
+则对 `B → γ` 加入：
 
 ```text
-[B -> . gamma, b]
+[B → . γ, b]
 ```
 
 其中：
 
 ```text
-b in FIRST(beta a)
+b ∈ FIRST(β a)
 ```
 
-直觉：`B` 之后会出现 `beta`，如果 `beta` 能空，再看原 item 的 lookahead `a`。
+直觉：`B` 之后会出现 `β`，如果 `β` 能空，再看原 item 的 lookahead `a`。
 
 `goto` 与 LR(0) 类似：先让点越过一个符号，再对结果做 LR(1) closure。区别只是 item 上保留 lookahead。
 
-手算 `FIRST(beta a)` 时按三种情况处理：
+手算 `FIRST(β a)` 时按三种情况处理：
 
-| `beta` 情况 | `FIRST(beta a)` 怎么看 |
+| `β` 情况 | `FIRST(β a)` 怎么看 |
 |---|---|
-| `beta` 以终结符 `t` 开头 | 结果就是 `{t}` |
-| `beta` 以不可空非终结符开头 | 取它的 FIRST，不含 epsilon |
-| `beta` 可空或为空 | 除了 `FIRST(beta)-{epsilon}`，还要把 `a` 传下去 |
+| `β` 以终结符 `t` 开头 | 结果就是 `{t}` |
+| `β` 以不可空非终结符开头 | 取它的 FIRST，不含 ε |
+| `β` 可空或为空 | 除了 `FIRST(β)-{ε}`，还要把 `a` 传下去 |
 
 如果同一个 LR(1) 状态里有多个 item 只差 lookahead，可以紧凑写成：
 
 ```text
-[V -> . x, {EOF, =}]
+[V → . x, {EOF, =}]
 ```
 
 它等价于：
 
 ```text
-[V -> . x, EOF]
-[V -> . x, =]
+[V → . x, EOF]
+[V → . x, =]
 ```
 
 这种紧凑写法只是在同一个状态里省空间，不等于 LALR 合并。
@@ -120,31 +120,31 @@ b in FIRST(beta a)
 文法：
 
 ```text
-S' -> S
-S  -> A c
-A  -> a
-A  -> epsilon
+S' → S
+S  → A c
+A  → a
+A  → ε
 ```
 
 初始 item：
 
 ```text
-[S' -> . S, EOF]
+[S' → . S, EOF]
 ```
 
-closure 第一步：点后是 `S`，`beta` 为空，原 lookahead 是 `EOF`：
+closure 第一步：点后是 `S`，`β` 为空，原 lookahead 是 `EOF`：
 
 ```text
-FIRST(beta EOF) = FIRST(EOF) = { EOF }
+FIRST(β EOF) = FIRST(EOF) = { EOF }
 ```
 
 加入：
 
 ```text
-[S -> . A c, EOF]
+[S → . A c, EOF]
 ```
 
-再看 `[S -> . A c, EOF]`，点后是 `A`，`beta` 是 `c`，原 lookahead 是 `EOF`：
+再看 `[S → . A c, EOF]`，点后是 `A`，`β` 是 `c`，原 lookahead 是 `EOF`：
 
 ```text
 FIRST(c EOF) = { c }
@@ -153,20 +153,20 @@ FIRST(c EOF) = { c }
 所以对 `A` 的每个产生式加入 lookahead `c`：
 
 ```text
-[A -> . a, c]
-[A -> . epsilon, c]
+[A → . a, c]
+[A → . ε, c]
 ```
 
 最终 closure：
 
 ```text
-[S' -> . S, EOF]
-[S  -> . A c, EOF]
-[A  -> . a, c]
-[A  -> . epsilon, c]
+[S' → . S, EOF]
+[S  → . A c, EOF]
+[A  → . a, c]
+[A  → . ε, c]
 ```
 
-重点：`A -> epsilon` 完成后只会在 lookahead `c` 上归约，不是在所有 `FOLLOW(A)` 上归约。这就是 LR(1) 比 SLR 精确的地方。
+重点：`A → ε` 完成后只会在 lookahead `c` 上归约，不是在所有 `FOLLOW(A)` 上归约。这就是 LR(1) 比 SLR 精确的地方。
 
 ## LR(1) 填表规则
 
@@ -174,7 +174,7 @@ LR(1) 构造表时，shift/goto 和 LR(0) 一样，reduce 更精确：
 
 1. 如果状态 `I` 对终结符 `t` 有边到 `J`，填 `ACTION[I,t] = shift J`。
 2. 如果状态 `I` 对非终结符 `A` 有边到 `J`，填 `GOTO[I,A] = J`。
-3. 如果状态 `I` 有完整项 `[A -> alpha ., a]`，只填 `ACTION[I,a] = reduce A -> alpha`。
+3. 如果状态 `I` 有完整项 `[A → α ., a]`，只填 `ACTION[I,a] = reduce A → α`。
 4. 如果增广开始产生式完成并读到 EOF，填 `accept`。
 
 考试里最容易错的是第 3 条：LR(1) 不再看 `FOLLOW(A)`，而是看 item 自带的 lookahead。
@@ -202,14 +202,14 @@ Core 指去掉 lookahead 后的 LR(0) item 集合。
 例：
 
 ```text
-[A -> alpha ., a]
-[A -> alpha ., b]
+[A → α ., a]
+[A → α ., b]
 ```
 
 合并后：
 
 ```text
-[A -> alpha ., {a,b}]
+[A → α ., {a,b}]
 ```
 
 LALR 通常比 LR(1) 状态少，表达能力接近 LR(1)，因此很多 parser generator 使用 LALR。
@@ -231,26 +231,26 @@ LALR 通常比 LR(1) 状态少，表达能力接近 LR(1)，因此很多 parser 
 
 ```text
 I:
-[A -> x ., a]
-[B -> y ., b]
+[A → x ., a]
+[B → y ., b]
 
 J:
-[A -> x ., b]
-[B -> y ., a]
+[A → x ., b]
+[B → y ., a]
 ```
 
 它们的 core 都是：
 
 ```text
-A -> x .
-B -> y .
+A → x .
+B → y .
 ```
 
 合并后：
 
 ```text
-[A -> x ., {a,b}]
-[B -> y ., {a,b}]
+[A → x ., {a,b}]
+[B → y ., {a,b}]
 ```
 
 现在 lookahead `a` 和 `b` 上都同时有两个 reduce，可能产生 reduce/reduce conflict。真实文法中不一定这么简单，但考试问“为什么 LALR 合并可能引入冲突”时，核心就是 lookahead 集合合并后扩大了归约条件。
@@ -337,7 +337,7 @@ void yyerror(const char *s) { /* report syntax error */ }
 ## Lex 与 Yacc 协作
 
 ```text
-source characters -> Lex -> tokens -> Yacc parser -> AST
+source characters → Lex → tokens → Yacc parser → AST
 ```
 
 Lex 返回 token 类型和语义值。Yacc 根据 token 序列做语法分析，并在归约时执行语义动作。
@@ -430,7 +430,7 @@ exp : '(' error ')'
 | LR(0) | 自底向上，最右推导逆 | LR(0) item DFA | 可以 | item/closure/goto 入门 |
 | SLR(1) | 自底向上 | LR(0) DFA + FOLLOW reduce | 可以 | 知道 FOLLOW 是全局近似 |
 | LALR(1) | 自底向上 | 合并 LR(1) same core | 可以 | parser generator 常用 |
-| LR(1) | 自底向上 | LR(1) item lookahead | 可以 | closure 中 `FIRST(beta a)` |
+| LR(1) | 自底向上 | LR(1) item lookahead | 可以 | closure 中 `FIRST(β a)` |
 
 两个判断题结论：
 
@@ -454,7 +454,7 @@ exp : '(' error ')'
 |---|---|---|
 | SLR 局限 | `SLR 为什么还不够精确` | 能说明 FOLLOW 是全局近似 |
 | LR(1) item | `LR(1) Item` | 会解释点、lookahead、起始项 |
-| LR(1) closure/goto | `LR(1) Closure`、`例题：LR(1) Closure 手算` | 会算 `FIRST(beta a)` |
+| LR(1) closure/goto | `LR(1) Closure`、`例题：LR(1) Closure 手算` | 会算 `FIRST(β a)` |
 | LR(1) reduce action | `LR(1) 填表规则` | 完整项只在 item lookahead 上归约 |
 | LR(0)/SLR/LR(1) 对比 | `LR(0)、SLR、LR(1) 的归约条件对比`、`语法分析方法总览` | 能做归约条件判断题 |
 | LALR 合并 | `LALR(1)` | 会找 same core，合并 lookahead |
@@ -466,7 +466,7 @@ exp : '(' error ')'
 
 ## 练习
 
-1. 写出 `[A -> alpha . B beta, a]` 的 LR(1) closure 规则。
+1. 写出 `[A → α . B β, a]` 的 LR(1) closure 规则。
 2. 比较同一完整项在 LR(0)、SLR、LR(1) 中的归约位置。
 3. 给两个 core 相同但 lookahead 不同的 LR(1) 状态，合并为 LALR 状态。
 4. 写一段 Yacc 规则，为加法和乘法构造 AST。

@@ -27,10 +27,10 @@
 
 ```text
 canonical Tree IR
-  -> instruction selection
-  -> abstract assembly with temporaries
-  -> register allocation
-  -> real assembly registers
+  → instruction selection
+  → abstract assembly with temporaries
+  → register allocation
+  → real assembly registers
 ```
 
 ## 指令选择的核心问题
@@ -339,11 +339,11 @@ MEM(BINOP(PLUS, CONST 1, CONST 2))
 
 | Tile | 成本 | 叶子 |
 |---|---:|---|
-| `CONST c` -> `ADDI r <- r0 + c` | 1 | 无 |
-| `BINOP(PLUS,e1,e2)` -> `ADD` | 1 | `e1,e2` |
-| `BINOP(PLUS,e,CONST c)` -> `ADDI` | 1 | `e` |
-| `MEM(e)` -> `LOAD` | 1 | `e` |
-| `MEM(BINOP(PLUS,e,CONST c))` -> `LOAD offset` | 1 | `e` |
+| `CONST c` → `ADDI r <- r0 + c` | 1 | 无 |
+| `BINOP(PLUS,e1,e2)` → `ADD` | 1 | `e1,e2` |
+| `BINOP(PLUS,e,CONST c)` → `ADDI` | 1 | `e` |
+| `MEM(e)` → `LOAD` | 1 | `e` |
+| `MEM(BINOP(PLUS,e,CONST c))` → `LOAD offset` | 1 | `e` |
 
 后序算：
 
@@ -391,12 +391,12 @@ tree grammar 用类似文法的规则描述 tiles，把 instruction selection �
 例如：
 
 ```text
-reg  -> TEMP
-reg  -> CONST
-reg  -> BINOP(PLUS, reg, reg)
-addr -> BINOP(PLUS, reg, CONST)
-reg  -> MEM(addr)
-stm  -> MOVE(MEM(addr), reg)
+reg  → TEMP
+reg  → CONST
+reg  → BINOP(PLUS, reg, reg)
+addr → BINOP(PLUS, reg, CONST)
+reg  → MEM(addr)
+stm  → MOVE(MEM(addr), reg)
 ```
 
 每个 nonterminal 代表一类结果位置，比如：
@@ -645,7 +645,7 @@ codegen 在 munch 时可以识别 `FP + k`，最终改成 `SP + k + frame_size`�
 读完本章后，你应该能对照 PPT 勾掉这些点：
 
 - 后端三任务：instruction selection、register allocation、instruction scheduling。
-- instruction selection 的输入/输出：canonical IR -> abstract assembly。
+- instruction selection 的输入/输出：canonical IR → abstract assembly。
 - tree pattern、tile、tiling。
 - Jouette 的教学意义和 `TEMP` 零成本。
 - `a[i] := x` 例子的地址计算、取数组基址、取 `x`、store。
@@ -680,7 +680,7 @@ codegen 在 munch 时可以识别 `FP + k`，最终改成 `SP + k + frame_size`�
 
 | English | 中文 | 考试提示 |
 |---|---|---|
-| instruction selection | 指令选择 | canonical IR -> abstract assembly |
+| instruction selection | 指令选择 | canonical IR → abstract assembly |
 | abstract assembly | 抽象汇编 | 还没分配物理寄存器 |
 | tree pattern | 树模式 | 一条机器指令对应的 IR fragment |
 | tile | 覆盖片 | tree pattern 的另一种叫法 |

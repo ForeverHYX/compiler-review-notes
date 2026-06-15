@@ -212,7 +212,7 @@ def inject_answer_drawers(markdown: str, note: Note, answer_index: AnswerIndex, 
         re.MULTILINE,
     )
     if pattern.search(markdown):
-        return pattern.sub("\n" + drawer + "\n", markdown, count=1)
+        return pattern.sub(lambda _match: "\n" + drawer + "\n", markdown, count=1)
 
     return markdown + "\n\n" + drawer
 
@@ -497,6 +497,15 @@ def page_template(title: str, body: str, notes: list[Note], current: str | None 
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{html.escape(title)}</title>
+  <script>
+    window.MathJax = {{
+      tex: {{
+        inlineMath: [["$", "$"]],
+        displayMath: [["$$", "$$"]]
+      }}
+    }};
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <style>
     :root {{
       color-scheme: light;

@@ -50,12 +50,12 @@ G = (T, N, P, S)
 例子：
 
 ```text
-E -> E + T
-E -> T
-T -> T * F
-T -> F
-F -> ( E )
-F -> id
+E → E + T
+E → T
+T → T * F
+T → F
+F → ( E )
+F → id
 ```
 
 这里的终结符通常已经是词法分析的 token，而不是源程序字符。例如源代码：
@@ -73,15 +73,15 @@ id := num + id
 课件和虎书中的 straight-line program 文法可以写成：
 
 ```text
-S -> S ; S
-S -> id := E
-S -> print ( L )
-E -> id
-E -> num
-E -> E + E
-E -> ( S , E )
-L -> E
-L -> L , E
+S → S ; S
+S → id := E
+S → print ( L )
+E → id
+E → num
+E → E + E
+E → ( S , E )
+L → E
+L → L , E
 ```
 
 这类文法用来说明：CFG 像 RE 一样是声明式 specification，parser 的 LL/LR 算法才是 implementation。
@@ -91,13 +91,13 @@ L -> L , E
 真实 parser 不能只判断“前缀像一个程序”，还要确认输入已经结束。因此常把文法增广：
 
 ```text
-S' -> S EOF
+S' → S EOF
 ```
 
 或写成：
 
 ```text
-S' -> S $
+S' → S $
 ```
 
 `$`/`EOF` 表示文件结束。后面 LR item 里经常出现 `$`，含义就是“完整程序后面不能再有别的 token”。
@@ -128,28 +128,28 @@ S' -> S $
 例子：
 
 ```text
-E -> E + T | T
-T -> id
+E → E + T | T
+T → id
 ```
 
 对 `id + id` 的最左推导：
 
 ```text
 E
-=> E + T
-=> T + T
-=> id + T
-=> id + id
+⇒ E + T
+⇒ T + T
+⇒ id + T
+⇒ id + id
 ```
 
 对同一个串的最右推导：
 
 ```text
 E
-=> E + T
-=> E + id
-=> T + id
-=> id + id
+⇒ E + T
+⇒ E + id
+⇒ T + id
+⇒ id + id
 ```
 
 两种推导顺序不同，但如果 parse tree 相同，说明结构理解相同。LL parser 通常构造最左推导；LR parser 做最右推导的逆过程。
@@ -160,14 +160,14 @@ E
 
 | 术语 | 条件 | 例子 |
 |---|---|---|
-| sentential form 句型 | `S =>* alpha`，`alpha` 可含终结符和非终结符 | `id + E` |
-| sentence 句子 | `S =>* w`，`w` 只含终结符 | `id + id` |
-| language 语言 | 文法能推出的所有句子集合 | `L(G)={w | S=>*w, w in T*}` |
+| sentential form 句型 | `S ⇒* α`，`α` 可含终结符和非终结符 | `id + E` |
+| sentence 句子 | `S ⇒* w`，`w` 只含终结符 | `id + id` |
+| language 语言 | 文法能推出的所有句子集合 | `L(G)={w | S⇒*w, w ∈ T*}` |
 
 例如：
 
 ```text
-E -> E + E | id
+E → E + E | id
 ```
 
 `id + E` 是句型，不是句子；`id + id` 是句子。
@@ -199,14 +199,14 @@ AST 不必保留所有中间非终结符，例如 `E`、`T`、`F`。
 Parse Tree 的规则：
 
 1. 根节点是开始符号。
-2. 每次使用产生式 `A -> X1 X2 ... Xk`，就在节点 `A` 下画孩子 `X1 ... Xk`。
+2. 每次使用产生式 `A → X1 X2 ... Xk`，就在节点 `A` 下画孩子 `X1 ... Xk`。
 3. 叶子从左到右连起来就是输入串，这个叶子串叫 `yield`。
 
 文法：
 
 ```text
-E -> E + T | T
-T -> id
+E → E + T | T
+T → id
 ```
 
 `id + id` 的 parse tree：
@@ -237,7 +237,7 @@ id + id
 
 ```text
 同一个终结符串
-  -> 两棵不同 parse tree
+  → 两棵不同 parse tree
 ```
 
 等价说法是：同一个串有两个不同的最左推导，或两个不同的最右推导。只给出两个普通推导序列不一定足够，因为它们可能只是同一棵树的不同展开顺序。
@@ -261,9 +261,9 @@ id + id
 经典二义表达式文法：
 
 ```text
-E -> E + E
-E -> E * E
-E -> id
+E → E + E
+E → E * E
+E → id
 ```
 
 `id + id * id` 可以解释为：
@@ -307,9 +307,9 @@ id + (id * id)
 解决方法通常是重写文法，把优先级和结合性编码进去：
 
 ```text
-E -> E + T | T
-T -> T * F | F
-F -> id | ( E )
+E → E + T | T
+T → T * F | F
+F → id | ( E )
 ```
 
 这里 `*` 比 `+` 优先级高，因为乘法在更深层的 `T/F` 中生成。
@@ -326,9 +326,9 @@ F -> id | ( E )
 例如：
 
 ```text
-E -> E + T | T      // + 在 E 层，优先级低
-T -> T * F | F      // * 在 T 层，优先级高
-F -> id | ( E )
+E → E + T | T      // + 在 E 层，优先级低
+T → T * F | F      // * 在 T 层，优先级高
+F → id | ( E )
 ```
 
 `id + id * id` 只能生成：
@@ -342,7 +342,7 @@ id + (id * id)
 左结合常写成左递归：
 
 ```text
-E -> E - T | T
+E → E - T | T
 ```
 
 它让 `id - id - id` 解释为：
@@ -354,7 +354,7 @@ E -> E - T | T
 右结合可写成右递归：
 
 ```text
-E -> T = E | T
+E → T = E | T
 ```
 
 这类规则常用于赋值表达式，让 `a = b = c` 解释成 `a = (b = c)`。
@@ -364,9 +364,9 @@ E -> T = E | T
 文法：
 
 ```text
-S -> if E then S
-S -> if E then S else S
-S -> other
+S → if E then S
+S → if E then S else S
+S → other
 ```
 
 对于：
@@ -380,9 +380,9 @@ if E1 then if E2 then S1 else S2
 一种无二义写法是区分 matched 和 unmatched statement：
 
 ```text
-S -> M | U
-M -> if E then M else M | other
-U -> if E then S
+S → M | U
+M → if E then M else M | other
+U → if E then S
    | if E then M else U
 ```
 
@@ -395,7 +395,7 @@ Yacc/Bison 里常见另一种工程做法：保留自然但二义的文法，用
 课件会强调：正则语言是上下文无关语言的子集。
 
 ```text
-Regular Language subset Context-Free Language
+Regular Language ⊆ Context-Free Language
 ```
 
 直觉：
@@ -406,7 +406,7 @@ Regular Language subset Context-Free Language
 例如任意深度括号：
 
 ```text
-S -> ( S ) S | epsilon
+S → ( S ) S | ε
 ```
 
 DFA 不能记录“已经开了多少个还没闭合的括号”，所以不能用正则表达式完整描述这种语言。
@@ -425,25 +425,25 @@ DFA 不能记录“已经开了多少个还没闭合的括号”，所以不能�
 CFG：
 
 ```text
-S -> a S b
-S -> a b
+S → a S b
+S → a b
 ```
 
 推导 `aaabbb`：
 
 ```text
-S => a S b => a a S b b => a a a b b b
+S ⇒ a S b ⇒ a a S b b ⇒ a a a b b b
 ```
 
 ## 从语言描述写 CFG 的常见模板
 
 | 语言特征 | CFG 模板 |
 |---|---|
-| 任意多个 A | `S -> A S | epsilon` |
-| 一个或多个 A | `S -> A S | A` |
-| A 和 B 数量相同且嵌套对应 | `S -> a S b | epsilon` |
-| 括号匹配 | `S -> ( S ) S | epsilon` |
-| 逗号分隔列表 | `List -> Item Rest`，`Rest -> , Item Rest | epsilon` |
+| 任意多个 A | `S → A S | ε` |
+| 一个或多个 A | `S → A S | A` |
+| A 和 B 数量相同且嵌套对应 | `S → a S b | ε` |
+| 括号匹配 | `S → ( S ) S | ε` |
+| 逗号分隔列表 | `List → Item Rest`，`Rest → , Item Rest | ε` |
 | 表达式优先级 | 高优先级放更深层非终结符 |
 
 写 CFG 时先判断语言是否需要“记忆嵌套”。如果需要任意深度嵌套，RE 往往不够，CFG 正好适合。
@@ -463,7 +463,7 @@ S => a S b => a a S b b => a a a b b b
 
 | PPT 主线 | 本章位置 |
 |---|---|
-| Parser 作用：token sequence -> parse tree / AST | “本章解决什么问题” |
+| Parser 作用：token sequence → parse tree / AST | “本章解决什么问题” |
 | CFG 四元组和 BNF 写法 | “上下文无关文法” |
 | Tiger straight-line program 文法 | “上下文无关文法”中的示例 |
 | EOF marker / augmented grammar | “EOF Marker” |
@@ -483,7 +483,7 @@ S => a S b => a a S b b => a a a b b b
 3. 判断下面文法是否二义，并说明原因：
 
 ```text
-E -> E - E | id
+E → E - E | id
 ```
 
 4. 重写表达式文法，使 `-` 左结合、`*` 优先级高于 `-`。
@@ -496,12 +496,12 @@ E -> E - E | id
 
 | English | 中文 | 考试提示 |
 |---|---|---|
-| parsing | 语法分析 | token stream -> parse tree/AST |
+| parsing | 语法分析 | token stream → parse tree/AST |
 | syntax analysis | 语法分析 | parsing 的同义说法 |
 | context-free grammar, CFG | 上下文无关文法 | `G=(T,N,P,S)` |
 | terminal | 终结符 | 通常是 Token |
 | nonterminal | 非终结符 | 语法变量 |
-| production | 产生式 | `A -> alpha` |
+| production | 产生式 | `A → α` |
 | start symbol | 开始符号 | 推导起点 |
 | sentence | 句子 | 只含终结符的句型 |
 | sentential form | 句型 | 推导过程中的中间串 |

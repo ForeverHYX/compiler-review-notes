@@ -26,10 +26,10 @@ PPT 里提到的 hot path、instruction cache、optimal trace 只是说明 trace
 
 ```text
 Tree IR
-  -> canonical trees / linear statement list
-  -> basic blocks
-  -> traces
-  -> 更适合 instruction selection 的语句顺序
+  → canonical trees / linear statement list
+  → basic blocks
+  → traces
+  → 更适合 instruction selection 的语句顺序
 ```
 
 ## 本章考试能力清单
@@ -198,7 +198,7 @@ BINOP(PLUS, CALL(f, []), CALL(g, []))
 
 ```text
 CALL(fun,args)
-  -> ESEQ(MOVE(TEMP t, CALL(fun,args)), TEMP t)
+  → ESEQ(MOVE(TEMP t, CALL(fun,args)), TEMP t)
 ```
 
 例如：
@@ -415,12 +415,12 @@ while Q 非空:
 假设 CFG 边为：
 
 ```text
-A -> B
-B -> C or D
-C -> E
-D -> F
-E -> done
-F -> done
+A → B
+B → C or D
+C → E
+D → F
+E → done
+F → done
 ```
 
 一种 trace covering 可以是：
