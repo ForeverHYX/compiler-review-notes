@@ -191,3 +191,7 @@
 - 已更新 `00_复习路线与课程覆盖.md`、`README.md`、`22_覆盖审计与补强说明.md`，把 OO 和 Loop Part II 降为低优先级，并说明“不考 / 不要求 / 供了解”内容的处理原则。
 - 已更新 `04`、`07`、`08`、`09`、`10`、`13`、`14`、`16`、`17`、`18` 等章节笔记，补入对应课件范围提示；第 17 章明确说明 `ch14 Classes` Outline/Summary 标注不考。
 - 已同步 `20_综合练习题.md`、`21_速查表.md`、`23_练习参考答案.md`、`24_回忆卷解析与考点加固.md` 的 OO、GC 和 Loop Part II 口径，避免全局资料继续把低优先级内容写成主线。
+- 本地验证通过：`python3 -m unittest tests.test_reader_server` 14 个测试通过，`python3 -m py_compile reader_server.py` 无输出，`git diff --check` 无输出，全站 Markdown 表格渲染检查通过。
+- 已提交并推送范围说明更新：`4dd81ea Document slide exam scope exclusions`。
+- 已部署 `4dd81ea` 到 `/opt/compiler-review-notes`，服务器端 `python3 -m unittest tests.test_reader_server` 14 个测试通过，`compiler-review-notes.service` 为 active。
+- 公网 HTTPS 验证通过：第 00 章页面显示 `ch14 Classes` 和 `ch18 Part II` 为低优先级，第 04/08/10/16/17/18/21 章页面分别显示 LL(1) 一般不考、formalization 无需掌握、SSA 不考、GC hybrid 不考算法细节、OO Outline/Summary 不考、Loop Part II 不考和速查表全局低优先级口径。
