@@ -182,3 +182,12 @@
 - 已提交并推送练习答案审计修复：`31e6458 Audit and fix exercise answers`。
 - 已部署到 `/opt/compiler-review-notes` 并重启 `compiler-review-notes.service`；服务器端 `python3 -m unittest tests.test_reader_server` 14 个测试通过，服务状态 active。
 - 服务器侧 HTTPS 验证通过：`https://foreverhyx.top/compiler-notes/` 返回 200；第 02 章页面包含 `<ol start="2">` 的 NFA-first 答案；第 20 章页面包含 `comprehensive-gc-question-title` SVG；第 23 章页面包含 “Thompson NFA 编号如下”。本机公网 `curl` 一度 DNS 解析失败，最终以服务器侧公网 HTTPS 验证为准。
+
+## 2026-06-18
+
+- 用户要求：对照 `materials/` 课件，把老师标注“不要求掌握 / 不考 / 供了解 / 供参考”的范围边界写进复习笔记，并同步在线 `https://foreverhyx.top/compiler-notes`，完成后 commit 和 push。
+- 恢复工作区后确认 `main...origin/main`，只有未跟踪 `.DS_Store` 和 `.omc/`；当前笔记无已提交外的修改。
+- 用 PyPDF2 抽取所有课程 PPT 的范围限定词，确认关键边界包括：LL(1) 实现代码一般不考、AST Attribute Grammar 不要求、语义分析 formalization/type derivation 无需掌握、IR 分类/SSA 不要求或不考、BasicBlockReordering 供了解、dataflow taxonomy 供参考、GC generational/incremental/hybrid 不考算法细节、OO/Classes 整体标注不考、Loop Part II 标注不考。
+- 已更新 `00_复习路线与课程覆盖.md`、`README.md`、`22_覆盖审计与补强说明.md`，把 OO 和 Loop Part II 降为低优先级，并说明“不考 / 不要求 / 供了解”内容的处理原则。
+- 已更新 `04`、`07`、`08`、`09`、`10`、`13`、`14`、`16`、`17`、`18` 等章节笔记，补入对应课件范围提示；第 17 章明确说明 `ch14 Classes` Outline/Summary 标注不考。
+- 已同步 `20_综合练习题.md`、`21_速查表.md`、`23_练习参考答案.md`、`24_回忆卷解析与考点加固.md` 的 OO、GC 和 Loop Part II 口径，避免全局资料继续把低优先级内容写成主线。

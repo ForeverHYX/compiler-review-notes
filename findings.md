@@ -157,3 +157,19 @@
 - 第 20 章综合题使用 `### 题 N` 结构，不在普通 `## 练习` 段落下；应单独按 21 个综合题标题与 21 个答案标题核对。
 - 综合题第 2 题旧答案说“如果不要求画具体状态编号，可用等价 DFA 作答”，与题干要求 Thompson NFA、ε-closure、subset construction 不一致；已改为 Thompson NFA 状态表和原始 subset DFA。
 - 综合题第 6 题旧答案直接给 SLR 表，容易让学生把它误认为无冲突 LR(0) 表；应明确 LR(0) 原始 ACTION 在 `I2` 的 `+` 上有 shift/reduce conflict，然后再给 FOLLOW 修正后的 SLR 表。
+
+## 课件范围排除说明审计
+
+- 已用 PyPDF2 抽取所有课程 PPT 中“不考 / 不要求 / 无需 / 供了解 / 供参考 / not covered”等提示，并和现有笔记对照。
+- 需要显式写入笔记的关键边界：
+  - `ch3 语法分析-2(TD).pdf`：Algorithm 3.13 不要求必需掌握；非递归/递归实现预测分析一般情况不考，到构造分析表为止。
+  - `ch4 抽象语法.pdf`：Attribute Grammar 不要求掌握；递归下降构造 AST 例子仅供参考。
+  - `ch5 语义分析.pdf`：Soundness/Completeness 和 advanced type systems 供参考；formalization、typing rules、type derivation 无需掌握。
+  - `ch6 活动记录*.pdf`：真实汇编、static link/display code generation 例子供参考，不要求背指令序列。
+  - `ch7 中间表示生成.pdf`：IR 分类不要求掌握；SSA 实验可能需要但不考。
+  - `ch8 基本块和traces.pdf`：精细 commute/alias 判断不要求掌握；basic block reordering 供了解。
+  - `ch10 活跃变量分析.pdf`：dataflow taxonomy 供参考。
+  - `ch11 寄存器分配2.pdf`：actual spill 题目口径需说明：select 阶段可能有多个 actual spills，rewrite 可一起做；若题目要求选一个马上 rewrite，则按题目做。
+  - `ch13 垃圾回收*.pdf`：generational/incremental 不考算法细节；hybrid copying algorithm 不考算法细节但可能涉及 locality；reference counting 优化供了解。
+  - `ch14 面向对象语言.pdf`：Outline/Summary 标注整个 Classes/OO 部分不考；descriptor coloring、methods coloring、OO optimization、hashing、bit vector/Cohen membership test 等不应深挖。
+  - `ch18 循环优化.pdf`：Part II（induction variables、array bounds check、loop unrolling）标注不考；笔记只保留速读套路。

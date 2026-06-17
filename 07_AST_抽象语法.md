@@ -37,6 +37,8 @@ Parse Tree 会包含 `E/T/F`、括号等文法节点；AST 只需：
 - 会识别 Tiger 风格 AST 中 `Var/Exp/Dec/Ty` 的大类和常见构造函数。
 - 会说明 AST 节点为什么要带 source position，以及 Yacc 中如何拿到位置。
 
+课件明确标注：Attribute Grammar 不要求掌握，递归下降构造 AST 的完整例子仅供参考。考试复习时把重点放在“AST 为什么比 parse tree 更适合作为接口”和“semantic action 何时创建 AST 节点”，不用背某份递归下降代码。
+
 本章不做完整类型检查、不做逃逸分析、不生成 IR；这些分别在后续语义分析、活动记录和 IR 章节展开。
 
 ## 属性文法只掌握思想

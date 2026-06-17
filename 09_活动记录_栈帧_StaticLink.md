@@ -23,6 +23,8 @@
 
 考试复习不需要背某个真实 ABI 的所有寄存器编号，但要能读懂 caller/callee-save、FP/SP、static link、display、lambda lifting 这些概念，并能在小程序上手算。
 
+课件里真实 x86-64 汇编、static link/display 的完整 code generation 示例都标成“供参考”。它们用于说明 static link 和 display 怎样落到机器代码，不要求背指令序列；答题重点仍是 frame 里有什么、static link 指向谁、访问外层变量要走几层。
+
 ## 运行时内存区域
 
 <figure class="svg-diagram" style="--diagram-max: 620px; --diagram-min: 420px;">

@@ -54,6 +54,8 @@ t2 = x + t1
 
 Tiger 课上真正展开的是 IR Tree，不是让你用三地址码做完整翻译。
 
+SSA 在课件中作为三地址码扩展出现，并标注“实验可能需要，但不考”。本章只需知道 SSA 是每个变量单次赋值的 IR 形式，方便现代优化；不要求会建 SSA、Phi 节点或 SSA 优化算法。
+
 ## Tree IR 节点
 
 Tiger compiler 使用一种低层 tree representation。它在 AST 和 assembly 之间：
