@@ -281,6 +281,11 @@ def markdown_to_html(markdown: str, base_path: str = "") -> str:
             index += 1
             continue
 
+        if is_markdown_details_block_start(line):
+            details_html, index = collect_markdown_details_block(lines, index, base_path=base_path)
+            blocks.append(details_html)
+            continue
+
         if is_raw_html_block_start(line):
             raw_lines, index = collect_raw_html_block(lines, index)
             blocks.append("\n".join(raw_lines))
@@ -363,6 +368,43 @@ def markdown_to_html(markdown: str, base_path: str = "") -> str:
 
 def is_raw_html_block_start(line: str) -> bool:
     return RAW_HTML_BLOCK_TAG_RE.match(line) is not None
+
+
+def is_markdown_details_block_start(line: str) -> bool:
+    return re.match(r"^\s*<details\b", line, flags=re.I) is not None and "</details>" not in line.lower()
+
+
+def collect_markdown_details_block(lines: list[str], index: int, base_path: str = "") -> tuple[str, int]:
+    opening_line = lines[index]
+    index += 1
+
+    summary_line = ""
+    if index < len(lines) and re.match(r"^\s*<summary\b", lines[index], flags=re.I):
+        summary_line = render_summary_line(lines[index], base_path=base_path)
+        index += 1
+
+    content_lines: list[str] = []
+    while index < len(lines):
+        if re.match(r"^\s*</details>\s*$", lines[index], flags=re.I):
+            index += 1
+            break
+        content_lines.append(lines[index])
+        index += 1
+
+    content = markdown_to_html("\n".join(content_lines).strip(), base_path=base_path)
+    parts = [opening_line]
+    if summary_line:
+        parts.append(summary_line)
+    parts.append(f'<div class="answer-content">{content}</div>')
+    parts.append("</details>")
+    return "\n".join(parts), index
+
+
+def render_summary_line(line: str, base_path: str = "") -> str:
+    match = re.match(r"^(\s*<summary[^>]*>)(.*?)(</summary>\s*)$", line, flags=re.I)
+    if not match:
+        return line
+    return f"{match.group(1)}{render_inline(match.group(2), base_path=base_path)}{match.group(3)}"
 
 
 def collect_raw_html_block(lines: list[str], index: int) -> tuple[list[str], int]:

@@ -108,6 +108,25 @@ class ReaderServerTests(unittest.TestCase):
         self.assertIn('<path d="M10 20 H110" />', html)
         self.assertNotIn("&lt;svg", html)
 
+    def test_markdown_inside_details_blocks_is_rendered(self):
+        html = reader_server.markdown_to_html(
+            '<details class="answer-drawer">\n'
+            "<summary>答案与解析</summary>\n"
+            "\n"
+            "**答案：True**\n"
+            "\n"
+            "```text\n"
+            "x <- 1\n"
+            "```\n"
+            "\n"
+            "</details>"
+        )
+
+        self.assertIn('<details class="answer-drawer">', html)
+        self.assertIn("<strong>答案：True</strong>", html)
+        self.assertIn('<pre><code class="language-text">x &lt;- 1</code></pre>', html)
+        self.assertNotIn("**答案：True**", html)
+
     def test_table_cells_preserve_pipes_inside_inline_code(self):
         html = reader_server.markdown_to_html(
             "| 正则 | 含义 |\n"
