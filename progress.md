@@ -195,3 +195,21 @@
 - 已提交并推送范围说明更新：`4dd81ea Document slide exam scope exclusions`。
 - 已部署 `4dd81ea` 到 `/opt/compiler-review-notes`，服务器端 `python3 -m unittest tests.test_reader_server` 14 个测试通过，`compiler-review-notes.service` 为 active。
 - 公网 HTTPS 验证通过：第 00 章页面显示 `ch14 Classes` 和 `ch18 Part II` 为低优先级，第 04/08/10/16/17/18/21 章页面分别显示 LL(1) 一般不考、formalization 无需掌握、SSA 不考、GC hybrid 不考算法细节、OO Outline/Summary 不考、Loop Part II 不考和速查表全局低优先级口径。
+
+## 2026-06-24
+
+- 用户要求把 `24_回忆卷解析与考点加固.md` 改成每道题单独展示题面、答案紧跟折叠；已完成并同步远端。为支持折叠块内 Markdown 正常渲染，`reader_server.py` 增加 `<details>` 内 Markdown 渲染逻辑，`tests/test_reader_server.py` 增加回归测试。
+- 用户随后要求回忆卷答案更详细，例如 LR(1) 项集要写推导过程；已开始扩写第 24 篇判断题、单选题和大题答案。
+- 用户进一步扩大范围：别的期末回忆卷/模拟卷也按同一标准补。先检索本地只看到 `20/23/24`，随后根据截图检查远端 `/opt/compiler-review-notes`，确认线上还有 `25-29` 五篇卷子；已用 scp 拉回本地。
+- 已补强 `24`：判断题逐条加判断依据；单选题补正则断句、LR(1) closure、FOLLOW 模板、loop invariant、Freeze、IR 执行、liveness、left-value、canonicalization、stack frame 解释；大题补 NFA 转移表、subset construction、DFA 最小化、LR(1) closure/goto 推导、Tiger 环境步骤、IR 地址/短路控制流、basic blocks/trace、liveness/interference、spill rewrite 与图着色流程。
+- 已补强 `23` 中综合题答案：题 1/3/4/5/6/7/9/10/11/12/13/14/15/16/17/18/19/20/21 均增加规则、代入过程和检查点，确保第 20 篇模拟卷网页答案也按步骤显示。
+- 已补强 `25_23-24编译原理期末回忆卷.md`：判断题和选择题新增逐题解析速查表，8 道大题改为步骤版答案。
+- 已补强 `26_编译原理期末大题回忆卷.md`：8 道大题全部扩写，包含状态表、LR(1)/LALR 项集、static link/display、IR 控制流、basic block/trace、maximal munch、liveness 固定点和 spill priority。
+- 已补强 `27_编译原理模拟期末卷A.md`、`28_编译原理模拟期末卷B.md`、`29_编译原理模拟期末卷C.md`：把所有短答案改成规则/代入/检查点形式，重点覆盖 DFA、LR、IR、liveness、GC、LICM、semantic analysis、coalescing 和 calling convention。
+- 本地全站渲染复查发现第 23 篇部分列表下方的 3 空格缩进 fenced code block 被误当成行内代码，页面会泄漏原始三反引号；根因是阅读器只识别行首 ` ``` `，没有支持 CommonMark 允许的 0-3 空格缩进围栏。
+- 按 TDD 增加 `test_indented_fenced_code_blocks_render_without_raw_ticks`，先确认失败，再修复 `reader_server.py`：识别缩进代码围栏、结束围栏，并按开围栏缩进剥离代码行同等前导空格。
+- 修复后本地验证通过：`python3 -m unittest tests/test_reader_server.py` 16 个测试通过，`python3 -m py_compile reader_server.py` 无输出，30 篇笔记全站渲染检查通过且不再泄漏原始三反引号，`git diff --check` 无输出。
+- 已将 `23-29`、`README.md`、`reader_server.py` 和 `tests/test_reader_server.py` 上传并覆盖到远端 `/opt/compiler-review-notes`；远端已有备份目录 `/opt/compiler-review-notes.prev/20260624140733`。
+- 远端验证通过：`cd /opt/compiler-review-notes && python3 -m unittest tests/test_reader_server.py` 16 个测试通过；远端全站渲染检查发现 30 篇笔记且无原始 fenced code marker 泄漏、无表格列数错乱。
+- 已重启 `compiler-review-notes.service`，`systemctl show` 显示 `ActiveState=active`，新主进程启动时间为 `Wed 2026-06-24 17:34:51 CST`。
+- 公网 HTTPS 验证通过：首页 `https://foreverhyx.top/compiler-notes/` 返回 200；`24-29` 六篇卷子页面均返回 200，关键内容如 `LR(1) closure`、`判断题解析速查`、`ACTION/GOTO`、`十六进制`、`Trace 1`、`Briggs` 均可在页面中找到，且没有 raw fenced code marker 或 `**答案：` 泄漏。

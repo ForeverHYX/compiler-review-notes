@@ -291,12 +291,14 @@ def markdown_to_html(markdown: str, base_path: str = "") -> str:
             blocks.append("\n".join(raw_lines))
             continue
 
-        if line.startswith("```"):
-            info = html.escape(line[3:].strip())
+        fence = parse_code_fence_start(line)
+        if fence is not None:
+            fence_indent, fence_info = fence
+            info = html.escape(fence_info)
             code_lines: list[str] = []
             index += 1
-            while index < len(lines) and not lines[index].startswith("```"):
-                code_lines.append(lines[index])
+            while index < len(lines) and not is_code_fence_close(lines[index]):
+                code_lines.append(strip_code_fence_indent(lines[index], fence_indent))
                 index += 1
             if index < len(lines):
                 index += 1
@@ -352,7 +354,7 @@ def markdown_to_html(markdown: str, base_path: str = "") -> str:
         while index < len(lines) and lines[index].strip():
             next_line = lines[index]
             if (
-                next_line.startswith("```")
+                parse_code_fence_start(next_line) is not None
                 or is_raw_html_block_start(next_line)
                 or next_line.startswith("#")
                 or re.match(r"^\s*([-*]|\d+\.)\s+", next_line)
@@ -368,6 +370,23 @@ def markdown_to_html(markdown: str, base_path: str = "") -> str:
 
 def is_raw_html_block_start(line: str) -> bool:
     return RAW_HTML_BLOCK_TAG_RE.match(line) is not None
+
+
+def parse_code_fence_start(line: str) -> tuple[int, str] | None:
+    match = re.match(r"^( {0,3})```(.*)$", line)
+    if not match:
+        return None
+    return len(match.group(1)), match.group(2).strip()
+
+
+def is_code_fence_close(line: str) -> bool:
+    return re.match(r"^ {0,3}```\s*$", line) is not None
+
+
+def strip_code_fence_indent(line: str, indent: int) -> str:
+    if indent <= 0:
+        return line
+    return line[indent:] if line.startswith(" " * indent) else line.lstrip(" ")
 
 
 def is_markdown_details_block_start(line: str) -> bool:

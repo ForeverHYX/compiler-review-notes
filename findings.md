@@ -147,6 +147,7 @@
 - 全量渲染审计已复现列数异常：`02_词法分析_RE_NFA_DFA_Lex.md` 5 行、`03_语法分析_CFG_推导_二义性.md` 6 行、`08_语义分析_符号表_类型检查.md` 2 行、`24_回忆卷解析与考点加固.md` 1 行。
 - 典型受影响内容包括正则表达式 `r | s`、CFG 产生式 `S -> A S | epsilon`、typing judgment `Gamma |- exp : ty`、回忆卷中的 `(a|c)*|(a|c)*b(a|c)*`。
 - 这是渲染器通用缺陷，不应通过逐条 Markdown 改写来规避；需要让表格切分只识别代码片段外的未转义 `|`。
+- 2026-06-24 复查发现另一类通用渲染缺陷：`23_练习参考答案.md` 中列表解释下方有 3 空格缩进 fenced code block，CommonMark 允许这种写法，但阅读器此前只识别行首 ` ``` `，导致页面出现原始三反引号。已用回归测试固定，并让阅读器支持 0-3 空格缩进的代码围栏。
 
 ## 练习答案严格审计
 
@@ -173,3 +174,24 @@
   - `ch13 垃圾回收*.pdf`：generational/incremental 不考算法细节；hybrid copying algorithm 不考算法细节但可能涉及 locality；reference counting 优化供了解。
   - `ch14 面向对象语言.pdf`：Outline/Summary 标注整个 Classes/OO 部分不考；descriptor coloring、methods coloring、OO optimization、hashing、bit vector/Cohen membership test 等不应深挖。
   - `ch18 循环优化.pdf`：Part II（induction variables、array bounds check、loop unrolling）标注不考；笔记只保留速读套路。
+
+## 卷子答案过程化补强
+
+- 用户把要求从 `24_回忆卷解析与考点加固.md` 扩展到“别的期末回忆卷/模拟卷”。本地原先只有 `20/23/24`，截图显示线上还有 `25-29`；远端 `/opt/compiler-review-notes` 确认存在并已拉回本地：
+  - `25_23-24编译原理期末回忆卷.md`
+  - `26_编译原理期末大题回忆卷.md`
+  - `27_编译原理模拟期末卷A.md`
+  - `28_编译原理模拟期末卷B.md`
+  - `29_编译原理模拟期末卷C.md`
+  - `20_综合练习题.md` 的答案来自 `23_练习参考答案.md` 的 `## 20 综合练习题`，阅读器会按题号注入到第 20 篇每题下方。
+- 本轮补强标准：题面不变；答案要从“结论”扩成“规则/算法 → 套入本题 → 中间步骤 → 最终答案/检查点”。
+- 已补强重点：
+  - `24` 大题一：补 NFA 转移表、完整 subset construction 表、DFA 终态判断和最小化分组拆分轮次。
+  - `24` 大题二：补 LR(1) closure 规则、`FIRST(βa)` 的 lookahead 推导、关键 `goto` 展开、ACTION/GOTO 表和 LR(1) reduce 检查点。
+  - `24` 大题三到七：补 Tiger 环境处理顺序、IR 地址计算/短路控制流、basic block/trace 规则、liveness/interference 表格模板、spill rewrite 和图着色流程。
+  - `23` 综合题答案：补 token 最长匹配过程、DFA 最小化模板、FIRST/FOLLOW/LL(1) 表填法、左递归改写代入、LR(0)/SLR 构造过程、liveness 方程代入、图着色栈、coalescing 判据、static link 访问步骤、GC 三算法过程、OO 动态派发、loop optimization 安全条件。
+  - `25`：补判断题/选择题逐题解析速查表，并将 8 道大题答案扩成可写过程分的步骤版。
+  - `26`：补 DFA、LALR(1)、static link/display、IR、basic block、maximal munch、liveness、spill priority 的详细过程。
+  - `27`：补判断/选择解释，并扩写十六进制 DFA、LR(1) 初始项集、for IR、liveness/interference。
+  - `28`：补 ESEQ、basic block、copying GC 小题解释，并扩写规范化、trace、tiling DP、LICM。
+  - `29`：补 FIRST/FOLLOW 与 LR、caller-save、寄存器共享、bounds check、Briggs，并扩写语义分析、static link、dataflow、coalescing 和调用约定。

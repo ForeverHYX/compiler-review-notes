@@ -127,6 +127,23 @@ class ReaderServerTests(unittest.TestCase):
         self.assertIn('<pre><code class="language-text">x &lt;- 1</code></pre>', html)
         self.assertNotIn("**答案：True**", html)
 
+    def test_indented_fenced_code_blocks_render_without_raw_ticks(self):
+        html = reader_server.markdown_to_html(
+            "1. 构造项集时必须先增广：\n"
+            "   ```text\n"
+            "   S' -> . S EOF\n"
+            "   ```\n"
+            "   完整项集族如下。"
+        )
+
+        self.assertIn("<ol><li>构造项集时必须先增广：</li></ol>", html)
+        self.assertIn(
+            '<pre><code class="language-text">S&#x27; -&gt; . S EOF</code></pre>',
+            html,
+        )
+        self.assertIn("<p>完整项集族如下。</p>", html)
+        self.assertNotIn("```text", html)
+
     def test_table_cells_preserve_pipes_inside_inline_code(self):
         html = reader_server.markdown_to_html(
             "| 正则 | 含义 |\n"
