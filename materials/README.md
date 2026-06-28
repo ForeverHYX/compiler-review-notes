@@ -6,6 +6,10 @@ This directory contains the textbook PDF and course slide PDFs uploaded with the
 
 - `Modern Compiler Implementation in C.pdf`
 
+## Past Papers
+
+- `24期末.pdf`
+
 ## Course Slides
 
 - `ch1 简介.pdf`

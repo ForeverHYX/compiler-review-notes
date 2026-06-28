@@ -213,3 +213,16 @@
 - 远端验证通过：`cd /opt/compiler-review-notes && python3 -m unittest tests/test_reader_server.py` 16 个测试通过；远端全站渲染检查发现 30 篇笔记且无原始 fenced code marker 泄漏、无表格列数错乱。
 - 已重启 `compiler-review-notes.service`，`systemctl show` 显示 `ActiveState=active`，新主进程启动时间为 `Wed 2026-06-24 17:34:51 CST`。
 - 公网 HTTPS 验证通过：首页 `https://foreverhyx.top/compiler-notes/` 返回 200；`24-29` 六篇卷子页面均返回 200，关键内容如 `LR(1) closure`、`判断题解析速查`、`ACTION/GOTO`、`十六进制`、`Trace 1`、`Briggs` 均可在页面中找到，且没有 raw fenced code marker 或 `**答案：` 泄漏。
+
+## 2026-06-28
+
+- 用户要求把 `/Users/foreverhyx/compiler-review-notes/24期末.pdf` 这份历年卷也部署到复习笔记网站，并生成可折叠参考答案；用户确认要“完整题面 + 折叠答案”，部署目标为 `https://foreverhyx.top/compiler-notes/`，服务器为 `root@116.62.147.239`。
+- 已探索项目结构：阅读器自动枚举根目录编号 Markdown，材料区自动枚举 `materials/` 文件；现有真题页使用 `<details class="answer-drawer">`。
+- 已用 PyPDF2 抽取 `24期末.pdf` 文本，并用临时 PyMuPDF 环境渲染页面核对图形题；确认 PDF 共 11 页。
+- 按 TDD 增加阅读器回归测试：要求首页列出 `30_2023-2024编译原理期末真题A卷.md` 和 `24期末.pdf`，并要求第 30 篇渲染后包含答案抽屉；红测失败，原因是第 30 篇和材料 PDF 尚未接入。
+- 已新增 `30_2023-2024编译原理期末真题A卷.md`，按原卷顺序整理 20 道判断题、20 道单选题和 8 道大题，每题后紧跟折叠参考答案。
+- 已更新 `README.md` 和 `materials/README.md`，并复制原卷到 `materials/24期末.pdf`，使首页材料区可直接打开 PDF。
+- 本地验证通过：新增红绿测试转绿，`python3 -m unittest tests.test_reader_server` 18 个测试通过，`python3 -m py_compile reader_server.py` 无输出，`git diff --check` 无输出，全站 31 篇笔记渲染检查通过且无表格列数错乱、无 raw fenced code marker 泄漏。
+- 已在远端创建备份 `/opt/compiler-review-notes.prev/20260628202411`，并用 `rsync -R` 同步第 30 篇、PDF、README、测试和计划文件到 `/opt/compiler-review-notes`。
+- 远端验证通过：`python3 -m unittest tests/test_reader_server.py` 18 个测试通过，远端全站 31 篇笔记渲染检查通过；`compiler-review-notes.service` 已重启，状态为 active/running，PID 640438。
+- 公网 HTTPS 验证通过：首页列出第 30 篇和 `24期末.pdf`；第 30 篇页面包含“判断题 1”“LALR(1) DFA 和 parsing table”和 `slot_t` 等关键内容；PDF 通过 GET 返回 HTTP 200，文件头为 `%PDF-1.3`，大小 346342 字节。`HEAD` 请求返回 501 是当前阅读器未实现 HEAD 方法，不影响浏览器打开 PDF。

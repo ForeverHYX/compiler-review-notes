@@ -195,3 +195,11 @@
   - `27`：补判断/选择解释，并扩写十六进制 DFA、LR(1) 初始项集、for IR、liveness/interference。
   - `28`：补 ESEQ、basic block、copying GC 小题解释，并扩写规范化、trace、tiling DP、LICM。
   - `29`：补 FIRST/FOLLOW 与 LR、caller-save、寄存器共享、bounds check、Briggs，并扩写语义分析、static link、dataflow、coalescing 和调用约定。
+
+## 2023-2024 真题 A 卷上线
+
+- `24期末.pdf` 是 2023-2024 春夏学期编译原理期末 A 卷，PDF 文本可用 PyPDF2 抽取；图形题需要用页面渲染核对。
+- Quick Look 只能渲染首页缩略图；使用 `/tmp/compiler_pdf_venv` 中的 PyMuPDF 成功渲染 11 页并裁出第 7、8 大题图。
+- 第 1 大题正则为 `nat=[0-9]+`、`signedNat=("+"|"-")? nat`、`number=signedNat("." nat)?(E signedNat)?`，因此不接受 `.5` 或 `3.`。
+- 第 3 道 LR 栈选择题按原卷表格规约 `S -> (S)S` 后应得到 `S1`，不是回忆卷旧答案中的 `S5`。
+- 第 8 大题按程序重算 spill priority，`t` 的 priority 为 `1/3`，当 `n>=1` 时最低，适合作为 spill candidate；可将旧 `r3` 保存到 `slot_t`，让 `m` 使用 `r3`。

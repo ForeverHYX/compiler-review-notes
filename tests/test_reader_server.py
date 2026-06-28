@@ -58,6 +58,26 @@ class ReaderServerTests(unittest.TestCase):
         self.assertIn("02_词法分析_RE_NFA_DFA_Lex.md", html)
         self.assertIn("ch18 循环优化.pdf", html)
 
+    def test_home_page_lists_2024_final_paper_and_pdf_material(self):
+        notes = reader_server.discover_notes(ROOT)
+        index = reader_server.load_answer_index(ROOT)
+
+        html = reader_server.render_home_page(ROOT, notes, index)
+
+        self.assertIn("30_2023-2024编译原理期末真题A卷.md", html)
+        self.assertIn("24期末.pdf", html)
+
+    def test_2024_final_paper_renders_collapsible_answers(self):
+        index = reader_server.load_answer_index(ROOT)
+        note = next(note for note in reader_server.discover_notes(ROOT) if note.number == "30")
+
+        html = reader_server.render_note_page(ROOT, note, index)
+
+        self.assertIn('<details class="answer-drawer">', html)
+        self.assertIn("判断题 1", html)
+        self.assertIn("参考答案", html)
+        self.assertIn("LALR(1) parsing table", html)
+
     def test_pages_load_mathjax_for_latex_notation(self):
         notes = reader_server.discover_notes(ROOT)
         index = reader_server.load_answer_index(ROOT)
